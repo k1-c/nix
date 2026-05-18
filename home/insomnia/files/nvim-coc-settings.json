@@ -1,0 +1,33 @@
+{
+  "explorer.file.showHiddenFiles": true,
+  "eslint.autoFixOnSave": true,
+  "coc.preferences.formatOnType": true,
+  "explorer.width": 36,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "cSpell.userWords": [
+    "Usecase",
+    "datahub",
+    "evaluatee",
+    "monthes",
+    "pnpm",
+    "tailwindcss",
+    "upsert",
+    "varchar"
+  ],
+  "languageserver": {
+    "haskell": {
+      "command": "haskell-language-server-wrapper",
+      "args": ["--lsp"],
+      "rootPatterns": [
+        "*.cabal",
+        "stack.yaml",
+        "cabal.project",
+        "package.yaml",
+        "hie.yaml"
+      ],
+      "filetypes": ["haskell", "lhaskell"]
+    }
+  }
+}
