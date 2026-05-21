@@ -9,6 +9,7 @@
     ./neovim.nix
     ./vscode.nix
     ./gitui.nix
+    ./desktop
   ];
 
   home.username = "insomnia";

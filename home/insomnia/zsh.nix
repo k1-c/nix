@@ -32,7 +32,6 @@
       shconf = "vim ~/.zshrc";
       j = "ghq_peco";
       "ghq-search" = "ghq_remote_peco";
-      pbcopy = "xsel --clipboard --input";
       ll = "eza -l -g -a --icons";
       ccusage = "npx ccusage@latest";
       python = "python3";

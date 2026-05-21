@@ -3,7 +3,7 @@
     ./boot.nix
     ./networking.nix
     ./locale.nix
-    ./desktop.nix
+    ./desktop
     ./nvidia.nix
     ./audio.nix
     ./fonts.nix
