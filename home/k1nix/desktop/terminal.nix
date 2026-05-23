@@ -8,7 +8,7 @@
 
   xdg.configFile."ghostty/config".text = ''
     # ─── 外観 ────────────────────────────────────────────────
-    theme = catppuccin-mocha
+    theme = Catppuccin Mocha
     background-opacity = 0.92
     window-padding-x = 8
     window-padding-y = 8

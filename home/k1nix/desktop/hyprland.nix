@@ -7,6 +7,21 @@ in
   # Hyprland はリッチに振る方針。Niri は最小機能性重視、Hyprland は見た目・体験重視。
   # NVIDIA + Wayland 用の env (WLR_NO_HARDWARE_CURSORS / GBM_BACKEND 等) は
   # hosts/insomnia/nvidia.nix でシステム全体に設定済み。dwarf では NVIDIA 無しで素直に動く。
+
+  # ディスプレイ設定 GUI。配置・解像度・スケール・回転を GUI で調整して
+  # ~/.config/hypr/monitors.conf と workspaces.conf に書き出してくれる。
+  home.packages = with pkgs; [ nwg-displays ];
+
+  # nwg-displays の出力先ファイルを事前に空で用意しておく。
+  # hyprland の `source = ...` は対象ファイルが存在しないとパースエラーになるので、
+  # 初回 switch 時点で必ず存在することを activation で保証する。
+  home.activation.ensureHyprDisplayConfigs =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      run mkdir -p "$HOME/.config/hypr"
+      [ -e "$HOME/.config/hypr/monitors.conf" ]   || run touch "$HOME/.config/hypr/monitors.conf"
+      [ -e "$HOME/.config/hypr/workspaces.conf" ] || run touch "$HOME/.config/hypr/workspaces.conf"
+    '';
+
   wayland.windowManager.hyprland = {
     enable = true;
 
@@ -24,6 +39,13 @@ in
       ];
 
       monitor = ",preferred,auto,1";
+
+      # nwg-displays が書き出すモニタ/ワークスペース設定を読み込む。
+      # 個別の monitor = 指定があれば上のワイルドカードより優先される。
+      source = [
+        "~/.config/hypr/monitors.conf"
+        "~/.config/hypr/workspaces.conf"
+      ];
 
       input = {
         kb_layout = "us";
@@ -113,6 +135,7 @@ in
         "$mod,       T,      exec, ghostty"
         "$mod,       D,      exec, walker"  # 旧バインドの互換用 (慣れたら削除可)
         "$mod,       L,      exec, hyprlock"
+        "$mod SHIFT, M,      exec, nwg-displays"
         # cliphist は walker でなく fuzzel --dmenu に通す。walker の clipboard module は
         # 自前 store を使うので、systemd 経由で常時走っている cliphist のヒストリと合わない。
         "$mod,       V,      exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
