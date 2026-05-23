@@ -14,9 +14,11 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
+    nix-claude-code.url = "github:ryoppippi/nix-claude-code";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, niri, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, niri, nix-claude-code, ... }@inputs:
     let
       mkHost = hostName: system:
         let

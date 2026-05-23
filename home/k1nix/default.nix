@@ -9,6 +9,7 @@
     ./neovim.nix
     ./vscode.nix
     ./gitui.nix
+    ./claude-code.nix
     ./desktop
   ];
 
