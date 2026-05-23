@@ -31,11 +31,13 @@ Both hosts share a single user account `k1nix`. Initial password is `password` (
 
 Pick at login via SDDM:
 
-- **Plasma** (X11) — default
+- **Plasma** (Wayland) — default. Liquid Glass-ish look (KWin Blur + Background Contrast + `kde-rounded-corners`, transparent panel). Walker bound to `Meta+Return` / `Meta+D`. Animated wallpaper via `plasma-smart-video-wallpaper-reborn` (drop a file at `~/.config/wallpaper/animated.mp4`).
 - **Niri** (Wayland, scrollable tiling)
 - **Hyprland** (Wayland, dynamic tiling)
 
-Per-DE home-manager configs live in `home/k1nix/desktop/{niri,hyprland}.nix`. waybar and friends run as systemd user units bound to `graphical-session.target`.
+Per-DE home-manager configs live in `home/k1nix/desktop/{plasma,niri,hyprland}.nix`. KDE side is configured declaratively via `plasma-manager`. waybar and friends run as systemd user units bound to `graphical-session.target`.
+
+> SDDM greeter itself still runs on X11 (`wayland.enable = false`) to dodge the NVIDIA + open-module + `kwin_wayland` atomic-modeset bug — only the Plasma *session* is Wayland.
 
 ---
 
@@ -192,3 +194,4 @@ What it does **not** catch: actual builds (proprietary NVIDIA, `niri-unstable`, 
 | `nixpkgs-unstable` | `NixOS/nixpkgs/nixos-unstable`             | `niri-flake` follows / a few newer packages |
 | `home-manager`     | `nix-community/home-manager/release-25.11` | user-level configuration                    |
 | `niri`             | `sodiboo/niri-flake`                       | `niri-unstable` + NixOS module              |
+| `plasma-manager`   | `nix-community/plasma-manager`             | declarative KDE Plasma 6 home-manager module |

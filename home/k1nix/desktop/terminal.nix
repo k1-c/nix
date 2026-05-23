@@ -12,7 +12,11 @@
     background-opacity = 0.92
     window-padding-x = 8
     window-padding-y = 8
-    window-decoration = false
+    # `server` = xdg-decoration-unstable-v1 で WM に装飾を任せる。
+    #   Plasma: KWin が Breeze タイトルバーを SSD で描く (移動/リサイズ可)。
+    #   Hyprland/Niri: SSD を強く描かないので、結果的に従来の裸タイル見た目に近い。
+    # `false` (= none) は Plasma で「ドラッグ領域ゼロ窓」になるので NG。
+    window-decoration = server
 
     # ─── フォント ────────────────────────────────────────────
     font-family = JetBrainsMono Nerd Font

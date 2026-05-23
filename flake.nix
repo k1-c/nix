@@ -15,10 +15,16 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, niri, nix-claude-code, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, niri, plasma-manager, nix-claude-code, ... }@inputs:
     let
       mkHost = hostName: system:
         let
@@ -35,6 +41,9 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
+              home-manager.sharedModules = [
+                plasma-manager.homeModules.plasma-manager
+              ];
               home-manager.users.k1nix = import ./home/k1nix;
             }
           ];
