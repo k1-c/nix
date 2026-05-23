@@ -68,37 +68,63 @@ in
     # plasma-manager の typed options で網羅されていない領域は configFile で直書きする。
     configFile = {
       kwinrc = {
-        # ビルトインの Blur / Background Contrast を有効化。
-        # KWin は _KDE_NET_WM_BLUR_BEHIND_REGION ヒントを持つ Qt/KDE アプリで自動的に効く。
-        # GTK 側もパネル/通知/メニューなど多くの面でフロステッド表現になる。
+        # 標準 Blur は KDE 対応アプリのみに効く。Chrome/Electron 等を含む
+        # 全ウィンドウに適用するため forceblur (Better Blur) を有効化。
+        # 両方有効でも forceblur 側が優先される。background contrast はガラス感の補助。
         Plugins = {
           blurEnabled = true;
+          forceblurEnabled = true;
           contrastEnabled = true;
-          # kde-rounded-corners が提供する KWin effect。upstream の CMakeLists.txt に従いプラグイン ID は "shapecorners"。
-          shapecornersEnabled = true;
           # 視覚的に重くなりがちな effect は無効化。
           wobblywindowsEnabled = false;
           magiclampEnabled = false;
         };
 
-        # Blur effect の強度。NVIDIA + Wayland でも問題ない範囲。
+        # Blur effect の強度 (標準 Blur 側)。NVIDIA + Wayland でも問題ない範囲。
         "Effect-blur" = {
           BlurStrength = 12;
           NoiseStrength = 4;
         };
 
-        # kde-rounded-corners (shapecorners) の角丸量・縁取り・影。
-        "Effect-shapecorners" = {
-          Size = 10;
-          ShadowSize = 20;
-          OutlineThickness = 1;
-          DisabledForMaximized = true;
+        # forceblur (Better Blur) の設定。ブラー強度と角丸の連動を強めにする。
+        "Effect-forceblur" = {
+          BlurStrength = 15;
+          NoiseStrength = 4;
+          # KDE 既定で blur しているウィンドウも上書きして強制適用。
+          BlurMatching = true;
+          BlurNonMatching = true;
+          # 一部の重い窓 (動画再生等) は除外したい場合はここに windowClass を列挙。
+          WindowClasses = "";
+          # 角丸 (Klassy の角丸量と揃える)。
+          RoundedCorners = true;
+          CornerRadius = 10;
         };
 
-        # ウィンドウ装飾を Breeze に固定 (theme が壊れたときの安全側)。
+        # ウィンドウ装飾を Klassy に切替。半透明タイトルバー + 角丸を内包する。
+        # 細かい opacity / border 等は plasma の System Settings → Window Decorations →
+        # Klassy の "Configure Klassy" GUI から、もしくは klassyrc を configFile で直書きする。
         "org.kde.kdecoration2" = {
-          library = "org.kde.breeze";
-          theme = "Breeze";
+          library = "org.kde.klassy";
+          theme = "Klassy";
+        };
+      };
+
+      # Klassy 本体の設定。タイトルバーに半透明 + blur 領域を設定して Liquid Glass にする。
+      # 設定キーは Klassy 上流の kdecoration/config/breezeconfigwidget.ui を参照。
+      klassyrc = {
+        Common = {
+          # アクティブ/非アクティブ両方のタイトルバーを半透明化。
+          OpaqueMaximizedTitleBars = false;
+          # タイトルバーの不透明度 (0-100)。低いほどガラス感が強い。
+          ActiveTitleBarOpacity = 60;
+          InactiveTitleBarOpacity = 50;
+          # タイトルバーに対しても blur 領域を要求 (KWin が blur する)。
+          BlurTransparentTitleBars = true;
+        };
+        Windeco = {
+          # 角丸の半径 (px)。Effect-forceblur 側の CornerRadius と揃える。
+          CornerRadius = 10;
+          DrawBackgroundGradient = false;
         };
       };
 

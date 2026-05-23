@@ -1,5 +1,9 @@
 { pkgs, ... }:
 
+let
+  klassy = pkgs.callPackage ./klassy.nix { };
+  kwinEffectsForceBlur = pkgs.callPackage ./kwin-effects-forceblur.nix { };
+in
 {
   # SDDM 上で Plasma セッションを選択可能にする。
   # defaultSession = "plasma" は modules/desktop/common.nix で設定済みで、
@@ -7,9 +11,13 @@
   services.desktopManager.plasma6.enable = true;
 
   # KWin の Wayland セッションで使う追加エフェクト。
-  # 角丸はビルトインに無いので kde-rounded-corners を入れて、
-  # KWin の effect 一覧に出るようにしておく (有効化は home/k1nix/desktop/plasma.nix 側で)。
-  environment.systemPackages = with pkgs; [
-    kde-rounded-corners
+  # Liquid Glass 構成:
+  #   - klassy: 半透明タイトルバー + 角丸を内包する window decoration。
+  #     Plasma の角丸 effect (kde-rounded-corners) は Klassy と機能重複かつ
+  #     描画干渉しやすいので削除した。
+  #   - kwin-effects-forceblur: Chrome/Electron 等の blur 非対応アプリにも強制 blur を適用。
+  environment.systemPackages = [
+    klassy
+    kwinEffectsForceBlur
   ];
 }
