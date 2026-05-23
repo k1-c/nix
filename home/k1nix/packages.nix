@@ -48,6 +48,12 @@
     # Containers (CLI; daemon enabled via modules/docker.nix)
     docker-compose
 
+    # Cloud CLIs
+    awscli2
+    google-cloud-sdk
+    vercel-cli
+    wrangler
+
     # Node (for coc.nvim, ccusage, etc. — mise may also provide it)
     nodejs_22
 
