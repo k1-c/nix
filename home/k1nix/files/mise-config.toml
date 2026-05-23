@@ -1,0 +1,3 @@
+[tools]
+"npm:vercel" = "latest"
+"npm:wrangler" = "latest"

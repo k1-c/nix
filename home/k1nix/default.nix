@@ -5,6 +5,7 @@
     ./packages.nix
     ./git.nix
     ./zsh.nix
+    ./mise.nix
     ./tmux.nix
     ./neovim.nix
     ./vscode.nix

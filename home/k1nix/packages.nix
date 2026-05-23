@@ -48,11 +48,9 @@
     # Containers (CLI; daemon enabled via modules/docker.nix)
     docker-compose
 
-    # Cloud CLIs
+    # Cloud CLIs (vercel / wrangler は mise 経由で導入。home/k1nix/mise.nix を参照)
     awscli2
     google-cloud-sdk
-    vercel-cli
-    wrangler
 
     # Node (for coc.nvim, ccusage, etc. — mise may also provide it)
     nodejs_22
