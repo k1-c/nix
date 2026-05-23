@@ -59,7 +59,8 @@ in
       "cliphist-pick" = {
         name = "Clipboard history (cliphist via fuzzel)";
         key = "Meta+V";
-        command = "sh -c 'cliphist list | fuzzel --dmenu | cliphist decode | wl-copy'";
+        # Desktop Entry Spec の Exec 値では ' と | は予約文字なのでダブルクォートで囲む。
+        command = ''sh -c "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"'';
       };
     };
 
