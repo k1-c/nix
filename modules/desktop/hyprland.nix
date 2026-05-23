@@ -17,7 +17,7 @@
 
   # Hyprland 固有のユーティリティ。
   # Wayland 共通 (wl-clipboard / grim / slurp / pamixer 等) は
-  # modules/nixos/desktop/niri.nix 側で既に入っているのでここでは扱わない。
+  # modules/desktop/niri.nix 側で既に入っているのでここでは扱わない。
   environment.systemPackages = with pkgs; [
     hyprpicker  # 画面の色を拾うピッカー (waybar クリック等から呼ぶ用途)
     hyprshot    # 領域・ウィンドウ単位 SS の Hyprland 用ラッパー

@@ -1,0 +1,25 @@
+name: flake check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Determinate Systems の installer は flakes / nix-command が
+      # デフォルトで有効、かつ Ubuntu runner 上で安定して動く。
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      # --no-build: derivation の build はせず eval だけで止める。
+      # nixosConfigurations.{insomnia,dwarf} が両方とも評価できるかを検証する。
+      - name: nix flake check (eval only)
+        run: nix flake check --no-build --show-trace

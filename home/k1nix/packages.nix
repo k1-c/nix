@@ -45,7 +45,7 @@
     # X / utilities
     xdotool
 
-    # Containers (CLI; daemon enabled via modules/nixos/docker.nix)
+    # Containers (CLI; daemon enabled via modules/docker.nix)
     docker-compose
 
     # Node (for coc.nvim, ccusage, etc. — mise may also provide it)
