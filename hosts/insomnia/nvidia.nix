@@ -8,7 +8,7 @@
   # Niri (Wayland) を安定して動かすため、proprietary kernel module ではなく
   # open kernel module を使う (Turing+ で必須化されつつある)。
   hardware.nvidia = {
-    open = lib.mkForce true;       # hosts/nixos/hardware-configuration.nix の `open = false` を上書き
+    open = lib.mkForce true;       # hosts/insomnia/hardware-configuration.nix の `open = false` を上書き
     modesetting.enable = true;     # hardware-configuration.nix で既に true
     nvidiaSettings = true;
     powerManagement.enable = true; # suspend / resume の安定性向上

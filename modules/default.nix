@@ -4,7 +4,6 @@
     ./networking.nix
     ./locale.nix
     ./desktop
-    ./nvidia.nix
     ./audio.nix
     ./fonts.nix
     ./printing.nix

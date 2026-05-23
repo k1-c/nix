@@ -33,14 +33,15 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
-              home-manager.users.insomnia = import ./home/insomnia;
+              home-manager.users.k1nix = import ./home/k1nix;
             }
           ];
         };
     in
     {
       nixosConfigurations = {
-        nixos = mkHost "nixos" "x86_64-linux";
+        insomnia = mkHost "insomnia" "x86_64-linux";
+        dwarf    = mkHost "dwarf"    "x86_64-linux";
       };
     };
 }

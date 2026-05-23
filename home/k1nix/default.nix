@@ -12,8 +12,8 @@
     ./desktop
   ];
 
-  home.username = "insomnia";
-  home.homeDirectory = "/home/insomnia";
+  home.username = "k1nix";
+  home.homeDirectory = "/home/k1nix";
   home.stateVersion = "25.11";
 
   programs.home-manager.enable = true;

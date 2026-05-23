@@ -9,7 +9,7 @@
     fzf
     ripgrep
     jq
-    # Plasma (X11) セッション用の clipboard ツール。Niri 側は wl-clipboard を home/insomnia/desktop/cliphist.nix で導入。
+    # Plasma (X11) セッション用の clipboard ツール。Niri 側は wl-clipboard を home/k1nix/desktop/cliphist.nix で導入。
     xclip
     xsel
     wl-clipboard

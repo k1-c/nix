@@ -3,14 +3,15 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./nvidia.nix
     ../../modules/nixos
   ];
 
-  networking.hostName = "nixos";
+  networking.hostName = "insomnia";
 
-  users.users.insomnia = {
+  users.users.k1nix = {
     isNormalUser = true;
-    description = "insomnia";
+    description = "k1nix";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
   };
