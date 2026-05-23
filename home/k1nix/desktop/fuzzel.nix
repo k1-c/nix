@@ -4,7 +4,7 @@
     settings = {
       main = {
         font = "JetBrainsMono Nerd Font:size=12";
-        terminal = "alacritty";
+        terminal = "ghostty";
         layer = "overlay";
         width = 40;
         lines = 12;

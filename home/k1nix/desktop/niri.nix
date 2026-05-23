@@ -71,7 +71,7 @@ in
     };
 
     binds = {
-      "${mod}+Return".action.spawn = "alacritty";
+      "${mod}+Return".action.spawn = "ghostty";
       "${mod}+D".action.spawn = "fuzzel";
       "${mod}+L".action.spawn = "hyprlock";
       "${mod}+Q".action = { close-window = { }; };

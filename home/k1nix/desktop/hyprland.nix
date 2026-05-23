@@ -14,10 +14,12 @@ in
       "$mod" = mod;
 
       # ─── 起動時に立ち上げるサービス ────────────────────────────────────
-      # waybar / swaync / cliphist は home-manager の systemd user unit が
+      # waybar / swaync / cliphist / walker は home-manager の systemd user unit が
       # graphical-session.target 連動で勝手に起動するので exec-once しない (二重起動防止)。
+      # start-wallpaper は mpvpaper (動画) → swaybg (画像/単色) の順でフォールバックするラッパー。
+      # 配置場所は ~/.config/wallpaper/animated.{mp4,webm,...} / static.{png,jpg,...}。
       exec-once = [
-        "swaybg -c '#1e1e2e'"
+        "start-wallpaper"
         "fcitx5 -d --replace"
       ];
 
@@ -107,9 +109,12 @@ in
 
       bind = [
         # アプリ起動
-        "$mod,       Return, exec, alacritty"
-        "$mod,       D,      exec, fuzzel"
+        "$mod,       Return, exec, walker"
+        "$mod,       T,      exec, ghostty"
+        "$mod,       D,      exec, walker"  # 旧バインドの互換用 (慣れたら削除可)
         "$mod,       L,      exec, hyprlock"
+        # cliphist は walker でなく fuzzel --dmenu に通す。walker の clipboard module は
+        # 自前 store を使うので、systemd 経由で常時走っている cliphist のヒストリと合わない。
         "$mod,       V,      exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
 
         # ウィンドウ操作
