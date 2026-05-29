@@ -55,6 +55,9 @@
     # Node (for coc.nvim, ccusage, etc. — mise may also provide it)
     nodejs_22
 
+    # Python
+    python3
+
     # Apps
     obsidian
     ulauncher
