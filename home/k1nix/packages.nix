@@ -67,5 +67,7 @@
   ]) ++ (with pkgs-unstable; [
     # nixos-25.11 の mise が古く [settings] node_compile に未対応のため unstable を採用
     mise
+    # nixos-25.11 の gh は古いため unstable を採用
+    gh
   ]);
 }

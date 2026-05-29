@@ -47,10 +47,11 @@
 
       # Switch Local GitHub Repositories
       function ghq_peco {
-        local dir
-        dir="$(ghq list -p | peco)"
-        if [ -n "$dir" ]; then
-          cd "$dir" || return
+        local selected dir
+        selected="$(ghq list | awk -F/ '{print $(NF-1)"/"$NF}' | peco)"
+        if [ -n "$selected" ]; then
+          dir="$(ghq list -p | grep -E "/$selected\$" | head -1)"
+          [ -n "$dir" ] && cd "$dir"
         fi
       }
 

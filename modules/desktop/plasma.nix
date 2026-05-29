@@ -19,5 +19,9 @@ in
   environment.systemPackages = [
     klassy
     kwinEffectsForceBlur
+    # smart-video-wallpaper-reborn の FadePlayer.qml が import QtMultimedia するため、
+    # システム側に QML モジュールを置いて plasmashell の QML import path から見えるようにする。
+    # 無いと壁紙 QML が読み込み失敗し、desktopcontainment ごと死んで Plasma panel が描画されない。
+    pkgs.kdePackages.qtmultimedia
   ];
 }
