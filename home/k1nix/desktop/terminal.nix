@@ -9,7 +9,7 @@
   xdg.configFile."ghostty/config".text = ''
     # ─── 外観 ────────────────────────────────────────────────
     theme = Catppuccin Mocha
-    background-opacity = 0.92
+    background-opacity = 0.5
     window-padding-x = 8
     window-padding-y = 8
     # `server` = xdg-decoration-unstable-v1 で WM に装飾を任せる。

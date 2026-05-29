@@ -83,4 +83,17 @@
   };
 
   home.file.".p10k.zsh".source = ./files/p10k.zsh;
+
+  # peco: 選択行が薄ピンクで読めない問題への対処。
+  # Selected を bold + reverse にして、テーマ非依存で必ず読める状態にする。
+  xdg.configFile."peco/config.json".text = builtins.toJSON {
+    Prompt = "QUERY>";
+    Style = {
+      Basic = [ "on_default" "default" ];
+      Selected = [ "bold" "reverse" ];
+      Query = [ "yellow" "bold" ];
+      Matched = [ "cyan" "bold" ];
+      SavedSelection = [ "bold" "on_yellow" "black" ];
+    };
+  };
 }
