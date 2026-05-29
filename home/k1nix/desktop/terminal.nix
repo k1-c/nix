@@ -23,7 +23,9 @@
     font-size = 11
 
     # ─── 体験 ────────────────────────────────────────────────
-    # Hyprland の blur が効くように background-blur を有効化
+    # blur を有効化 (ON/OFF のみ)。
+    # Hyprland では radius として効くが、Plasma (KWin) では radius は無視されて
+    # ON/OFF のみ。強度は home/k1nix/desktop/plasma.nix の Effect-blur / Effect-forceblur で制御。
     background-blur = true
     cursor-style = block
     cursor-style-blink = true

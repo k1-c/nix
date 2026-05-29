@@ -81,14 +81,15 @@ in
         };
 
         # Blur effect の強度 (標準 Blur 側)。NVIDIA + Wayland でも問題ない範囲。
+        # 範囲 1-15。低いほど背景が透けて見える。
         "Effect-blur" = {
-          BlurStrength = 12;
+          BlurStrength = 4;
           NoiseStrength = 4;
         };
 
         # forceblur (Better Blur) の設定。ブラー強度と角丸の連動を強めにする。
         "Effect-forceblur" = {
-          BlurStrength = 15;
+          BlurStrength = 4;
           NoiseStrength = 4;
           # KDE 既定で blur しているウィンドウも上書きして強制適用。
           BlurMatching = true;
