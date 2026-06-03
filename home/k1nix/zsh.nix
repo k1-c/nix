@@ -56,9 +56,18 @@
       }
 
       # Search & Clone Remote GitHub Repositories
+      # 自分のリポジトリ + 所属 organization のリポジトリをまとめて peco に渡す。
+      # org メンバーシップが private な場合は gh auth に read:org スコープが必要。
       function ghq_remote_peco {
         local repo
-        repo="$(gh repo list --limit 100 --json nameWithOwner --jq '.[].nameWithOwner' | peco)"
+        repo="$(
+          {
+            gh repo list --limit 200 --json nameWithOwner --jq '.[].nameWithOwner'
+            gh api user/orgs --jq '.[].login' 2>/dev/null | while IFS= read -r owner; do
+              [ -n "$owner" ] && gh repo list "$owner" --limit 200 --json nameWithOwner --jq '.[].nameWithOwner'
+            done
+          } | awk '!seen[$0]++' | peco
+        )"
         if [ -n "$repo" ]; then
           ghq get "$repo"
           local dir
