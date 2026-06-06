@@ -83,6 +83,7 @@
 
     #list {
       background: transparent;
+      min-height: 360px;
     }
 
     #list row,
