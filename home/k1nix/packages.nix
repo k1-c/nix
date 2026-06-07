@@ -32,11 +32,22 @@
       fi
     '')
 
+    # macOS-style `open` shim. zsh の shellAliases は対話シェル限定で
+    # Neovim の :! やプラグインから呼ばれる非対話シェルでは効かないため、
+    # 実バイナリとして PATH に置く。
+    (writeShellScriptBin "open" ''
+      exec ${xdg-utils}/bin/xdg-open "$@"
+    '')
+
     # Dev tools
     gitui
     ghq
     peco
     lazygit
+
+    # Image / PDF processing (プロジェクトの check-libs タスクが gm/gs を要求)
+    graphicsmagick   # provides `gm`
+    ghostscript      # provides `gs`
 
     # Build toolchain (needed by lazy.nvim build steps, e.g. telescope-fzf-native)
     gcc

@@ -35,7 +35,6 @@
       ll = "eza -l -g -a --icons";
       ccusage = "npx ccusage@latest";
       python = "python3";
-      open = "xdg-open";
     };
 
     initContent = ''

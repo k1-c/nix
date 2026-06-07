@@ -1,3 +1,14 @@
+# NixOS では nix-ld 経由で各言語の公式 prebuilt バイナリがそのまま動くため、
+# ソースビルドを全面禁止する。フォールバックが発動すると V8 等の C++ ビルドで
+# 30〜60分かかり実質ハングのように見えるため fail-fast にしている。
+# mise 2026.x 以降は [settings.node] のネスト形式が正、flat な node_compile は
+# "unknown field" 警告になる。
+[settings]
+all_compile = false       # Node/Ruby/Python/Erlang 等まとめてビルド禁止
+
+[settings.node]
+compile = false           # 明示的に node も再度禁止（all_compile が将来削除されても保険）
+
 [tools]
 "npm:vercel" = "latest"
 "npm:wrangler" = "latest"

@@ -34,6 +34,14 @@
       xorg.libXrandr
       xorg.libxcb
       alsa-lib
+
+      # Node.js prebuilt および npm のネイティブ addon (prebuild-install で
+      # 落ちてくる .node バイナリ) が dlopen する代表的なライブラリ。
+      # mise 経由の node や better-sqlite3 / keytar 等で必要になりやすい。
+      libuv
+      icu
+      sqlite
+      libsecret
     ];
   };
 }

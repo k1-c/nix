@@ -6,6 +6,7 @@
     ./git.nix
     ./zsh.nix
     ./mise.nix
+    ./prisma.nix
     ./tmux.nix
     ./neovim.nix
     ./vscode.nix
