@@ -53,6 +53,7 @@
       nixosConfigurations = {
         insomnia = mkHost "insomnia" "x86_64-linux";
         dwarf    = mkHost "dwarf"    "x86_64-linux";
+        mind     = mkHost "mind"     "x86_64-linux";
       };
     };
 }
