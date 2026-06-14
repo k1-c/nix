@@ -12,4 +12,3 @@ compile = false           # 明示的に node も再度禁止（all_compile が�
 [tools]
 "npm:vercel" = "latest"
 "npm:wrangler" = "latest"
-"npm:composio-core" = "latest"

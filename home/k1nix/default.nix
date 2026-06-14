@@ -12,6 +12,7 @@
     ./vscode.nix
     ./gitui.nix
     ./claude-code.nix
+    ./composio.nix
     ./desktop
   ];
 
