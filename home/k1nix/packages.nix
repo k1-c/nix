@@ -80,5 +80,7 @@
     mise
     # nixos-25.11 の gh は古いため unstable を採用
     gh
+    # nixos-25.11 の codex が古いため unstable を採用 (最新版を取得)
+    codex
   ]);
 }
