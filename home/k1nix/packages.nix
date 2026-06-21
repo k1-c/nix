@@ -49,6 +49,11 @@
     graphicsmagick   # provides `gm`
     ghostscript      # provides `gs`
 
+    # Diagram export (drawio の headless export 用に xvfb / chromium を併せて導入)
+    drawio           # provides `drawio` CLI (`drawio -x ...`)
+    xvfb-run         # headless 用の仮想 X サーバ (`xvfb-run drawio -x ...`)
+    chromium
+
     # Build toolchain (needed by lazy.nvim build steps, e.g. telescope-fzf-native)
     gcc
     gnumake
