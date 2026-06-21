@@ -8,6 +8,7 @@
     ./fonts.nix
     ./printing.nix
     ./nix-settings.nix
+    ./auto-upgrade.nix
     ./packages.nix
     ./programs.nix
     ./zsh.nix
