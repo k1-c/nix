@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # mise 専用。nixos-unstable チャンネルは CI ゲートのため mise が遅れがち
+    # (例: 2026.6.5)。CI 前の nixpkgs-unstable ブランチはより新しい mise
+    # (例: 2026.6.11) を持つため、mise だけこちらから取得して影響範囲を限定する。
+    nixpkgs-mise.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -24,11 +28,12 @@
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, niri, plasma-manager, nix-claude-code, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, home-manager, niri, plasma-manager, nix-claude-code, ... }@inputs:
     let
       mkHost = hostName: system:
         let
           pkgs-unstable = import nixpkgs-unstable { inherit system; };
+          pkgs-mise = import nixpkgs-mise { inherit system; };
         in
         nixpkgs.lib.nixosSystem {
           inherit system;
@@ -40,7 +45,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
+              home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable pkgs-mise; };
               home-manager.sharedModules = [
                 plasma-manager.homeModules.plasma-manager
               ];

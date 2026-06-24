@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, pkgs-unstable, pkgs-mise, ... }:
 
 {
   home.packages = (with pkgs; [
@@ -77,15 +77,19 @@
     # Apps
     obsidian
     ulauncher
+    video-trimmer
 
     # GUI helpers
     kdePackages.kate
   ]) ++ (with pkgs-unstable; [
-    # nixos-25.11 の mise が古く [settings] node_compile に未対応のため unstable を採用
-    mise
     # nixos-25.11 の gh は古いため unstable を採用
     gh
     # nixos-25.11 の codex が古いため unstable を採用 (最新版を取得)
     codex
+  ]) ++ (with pkgs-mise; [
+    # mise は更新が速く nixos-unstable チャンネルでも遅れがちなため、
+    # nixpkgs-unstable ブランチ (nixpkgs-mise input) から最新を取得する。
+    # nixos-25.11 の mise は [settings] node_compile 未対応でもある。
+    mise
   ]);
 }
