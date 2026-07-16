@@ -25,6 +25,13 @@
     defaultSession = "plasma";
   };
 
+  # Chromium / Electron 系 (google-chrome / chromium / slack / vscode 等) を
+  # Wayland ネイティブ (Ozone) で起動させる。これが無いと X11/XWayland に
+  # フォールバックし、Google Meet 等の画面共有でウィンドウ・全画面が
+  # xdg-desktop-portal 経由で列挙されず「タブ共有しか出てこない」状態になる。
+  # Wayland ネイティブ起動なら kde portal + PipeWire の共有ピッカーが効く。
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
   # Wayland セッション (Niri / AGS / fuzzel / swaync など) で必須になる layer-shell や
   # screencast / file-chooser portal をまとめてここで有効化する。
   xdg.portal = {

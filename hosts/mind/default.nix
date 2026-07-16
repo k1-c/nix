@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules
+    ../../modules/displaylink.nix
   ];
 
   networking.hostName = "mind";

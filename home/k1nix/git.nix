@@ -8,6 +8,10 @@
       { path = "~/.gitconfig.local"; }
     ];
 
+    ignores = [
+      "**/.claude/settings.local.json"
+    ];
+
     settings = {
       user = {
         name = "k1-c";
@@ -31,8 +35,6 @@
       apply.whitespace = "fix";
       branch.sort = "-committerdate";
       core = {
-        excludesfile = "~/.gitignore";
-        attributesfile = "~/.gitattributes";
         editor = "vim -c \"set fenc=utf-8\"";
       };
       help.autocorrect = 1;

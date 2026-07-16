@@ -26,4 +26,10 @@
       fcitx5-gtk
     ];
   };
+
+  # Plasma Wayland では waylandFrontend により GTK_IM_MODULE が未設定になり、
+  # GTK アプリ (Ghostty) が Wayland text-input 経路を使う。これが Ghostty 側で
+  # 不安定で mozc が時々効かなくなる (ghostty-org/ghostty#12124)。
+  # fcitx5-gtk 経由に逃がして安定させる。QT は waylandFrontend のまま触らない。
+  environment.sessionVariables.GTK_IM_MODULE = "fcitx";
 }
