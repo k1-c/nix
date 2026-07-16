@@ -32,7 +32,10 @@
     let
       mkHost = hostName: system:
         let
-          pkgs-unstable = import nixpkgs-unstable { inherit system; };
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
           pkgs-mise = import nixpkgs-mise { inherit system; };
         in
         nixpkgs.lib.nixosSystem {
