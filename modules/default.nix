@@ -13,5 +13,6 @@
     ./programs.nix
     ./zsh.nix
     ./docker.nix
+    ./tailscale.nix
   ];
 }
