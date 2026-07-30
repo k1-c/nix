@@ -26,9 +26,13 @@
     };
 
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
+
+    # herdr (AI エージェント・マルチプレクサ) は nixpkgs 未収録のため公式 flake から取得。
+    # 独自の nixpkgs + rust-overlay でソースビルドするため follows は付けない。
+    herdr.url = "github:ogulcancelik/herdr";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, home-manager, niri, plasma-manager, nix-claude-code, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, home-manager, niri, plasma-manager, nix-claude-code, herdr, ... }@inputs:
     let
       mkHost = hostName: system:
         let

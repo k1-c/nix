@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, pkgs-mise, ... }:
+{ pkgs, pkgs-unstable, pkgs-mise, inputs, ... }:
 
 {
   home.packages = (with pkgs; [
@@ -88,7 +88,10 @@
     codex
     # 1Password CLI (`op`)。nixos-25.11 は 2.32.0 と古いため unstable を採用
     _1password-cli
-  ]) ++ (with pkgs-mise; [
+  ]) ++ [
+    # herdr (AI エージェント・マルチプレクサ)。nixpkgs 未収録のため公式 flake から取得。
+    inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ] ++ (with pkgs-mise; [
     # mise は更新が速く nixos-unstable チャンネルでも遅れがちなため、
     # nixpkgs-unstable ブランチ (nixpkgs-mise input) から最新を取得する。
     # nixos-25.11 の mise は [settings] node_compile 未対応でもある。
