@@ -67,6 +67,7 @@
     # Cloud CLIs (vercel / wrangler は mise 経由で導入。home/k1nix/mise.nix を参照)
     awscli2
     google-cloud-sdk
+    terraform        # BSL(unfree)。allowUnfree で許可済み
 
     # Node (for coc.nvim, ccusage, etc. — mise may also provide it)
     nodejs_22
