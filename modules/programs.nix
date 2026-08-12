@@ -1,7 +1,23 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 {
   programs.firefox.enable = true;
+
+  # 1Password デスクトップアプリ。ブラウザ統合の setuid ラッパー・polkit ポリシー・
+  # CLI 連携 (アプリでの生体認証アンロック) をまとめて有効化するため、
+  # home.packages ではなく NixOS モジュールで導入する。
+  # nixos-25.11 は版が古くなりがちなため、CLI (`op`) と同様 unstable を採用。
+  programs._1password = {
+    enable = true;
+    # nixos-25.11 の op は 2.32.0 と古いため unstable を採用。
+    package = pkgs-unstable._1password-cli;
+  };
+  programs._1password-gui = {
+    enable = true;
+    package = pkgs-unstable._1password-gui;
+    # ブラウザ統合の system authentication を許可するユーザー。
+    polkitPolicyOwners = [ "k1nix" ];
+  };
 
   # 汎用 Linux 向けの動的リンクバイナリ (oklch-color-picker, prebuilt language
   # servers, mise が落としてくる toolchain など) を NixOS でも実行できるようにする。

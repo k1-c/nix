@@ -87,8 +87,6 @@
     gh
     # nixos-25.11 の codex が古いため unstable を採用 (最新版を取得)
     codex
-    # 1Password CLI (`op`)。nixos-25.11 は 2.32.0 と古いため unstable を採用
-    _1password-cli
   ]) ++ [
     # herdr (AI エージェント・マルチプレクサ)。nixpkgs 未収録のため公式 flake から取得。
     inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default

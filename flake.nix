@@ -44,7 +44,7 @@
         in
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit inputs; };
+          specialArgs = { inherit inputs pkgs-unstable; };
           modules = [
             ./hosts/${hostName}
             niri.nixosModules.niri
