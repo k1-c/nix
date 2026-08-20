@@ -39,6 +39,42 @@
           pkgs-unstable = import nixpkgs-unstable {
             inherit system;
             config.allowUnfree = true;
+            overlays = [
+              # 1Password CLI の Environments 機能 (op environment / op run
+              # --environment) は 2026-08 時点で beta 版のみ対応。安定版 2.34.1
+              # (nixpkgs が配布する最新) は未対応のため、公式 beta の prebuilt
+              # バイナリに差し替える。op 自体に自動更新機能は無いので、更新時は
+              # 下記 version を最新 beta にし、
+              #   nix-prefetch-url --unpack <zip URL> | xargs nix hash to-sri --type sha256
+              # で得た hash を書き換えて rebuild する。
+              # 一覧: https://releases.1password.com/developers/cli-beta/
+              # (全ホスト x86_64-linux 前提で linux_amd64 を直指定)
+              (final: prev: {
+                _1password-cli = prev._1password-cli.overrideAttrs (old: rec {
+                  version = "2.38.1-beta.01";
+                  src = prev.fetchzip {
+                    url = "https://cache.agilebits.com/dist/1P/op2/pkg/v${version}/op_linux_amd64_v${version}.zip";
+                    hash = "sha256-8o7xDxZcvQ1NSFpKxRzJXSkousl/Uk5YB2ji1+EIjIM=";
+                    stripRoot = false;
+                  };
+                });
+
+                # GUI も nixpkgs は prebuilt tarball を落とすだけ (linux.nix は
+                # version をパス生成に使わない) なので、version/src の差し替えで
+                # 最新安定版に更新できる。nixpkgs-unstable 自体は上げない
+                # (上げると niri が libdisplay-info 削除で壊れるため)。
+                # 更新時: 下記の stable tarball URL の version を変え、
+                #   nix-prefetch-url <URL> | xargs nix hash convert --to sri --hash-algo sha256
+                # で hash を更新する。
+                _1password-gui = prev._1password-gui.overrideAttrs (old: rec {
+                  version = "8.12.32";
+                  src = prev.fetchurl {
+                    url = "https://downloads.1password.com/linux/tar/stable/x86_64/1password-${version}.x64.tar.gz";
+                    hash = "sha256-dg42SQNMS77+393sDP66weZ33VVIKjOQEZwaK82ifZc=";
+                  };
+                });
+              })
+            ];
           };
           pkgs-mise = import nixpkgs-mise { inherit system; };
         in
