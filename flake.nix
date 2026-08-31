@@ -9,6 +9,14 @@
     # (例: 2026.6.11) を持つため、mise だけこちらから取得して影響範囲を限定する。
     nixpkgs-mise.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
+    # COSMIC 専用。Frosted Glass は COSMIC 1.3 で入った機能だが、nixpkgs
+    # nixos-25.11 は cosmic 1.0.0、上の nixpkgs-unstable pin は 1.0.16、
+    # 現 stable の nixos-26.05 でも 1.2.0 で未搭載。nixos-unstable だけが
+    # 1.6.0 を持つ。nixpkgs-unstable 自体を上げると niri が壊れる (下の
+    # 1Password overlay のコメント参照) ので、mise と同じく COSMIC だけ
+    # 別 input に隔離して影響範囲を mind ホストに閉じ込める。
+    nixpkgs-cosmic.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,7 +40,7 @@
     herdr.url = "github:ogulcancelik/herdr";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, home-manager, niri, plasma-manager, nix-claude-code, herdr, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, nixpkgs-cosmic, home-manager, niri, plasma-manager, nix-claude-code, herdr, ... }@inputs:
     let
       mkHost = hostName: system:
         let
@@ -77,10 +85,14 @@
             ];
           };
           pkgs-mise = import nixpkgs-mise { inherit system; };
+          # COSMIC 一式 (cosmic-* / xdg-desktop-portal-cosmic / pop-launcher) を
+          # ここから overlay で差し替える。実際に forcing されるのは
+          # modules/desktop/cosmic.nix を import したホストだけ。
+          pkgs-cosmic = import nixpkgs-cosmic { inherit system; };
         in
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit inputs pkgs-unstable; };
+          specialArgs = { inherit inputs pkgs-unstable pkgs-cosmic; };
           modules = [
             ./hosts/${hostName}
             niri.nixosModules.niri

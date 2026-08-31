@@ -5,6 +5,9 @@
     ./hardware-configuration.nix
     ../../modules
     ../../modules/displaylink.nix
+    # COSMIC (Frosted Glass 目的で unstable の 1.6.0 を使う) は mind 限定。
+    # 他ホストは NVIDIA / 未検証なので modules/desktop/default.nix には入れない。
+    ../../modules/desktop/cosmic.nix
   ];
 
   networking.hostName = "mind";
