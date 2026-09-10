@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   # Phase 2 では軽量に waybar を使う。
@@ -70,4 +70,16 @@
       }
     '';
   };
+
+  # COSMIC セッションでは cosmic-panel が同じ役割を担うので waybar は出さない。
+  # セッションは SDDM でログイン時に選ぶ運用なので eval 時には判定できず、
+  # unit 側の ConditionEnvironment で起動時に弾く
+  # (cosmic-session が systemd user manager に XDG_CURRENT_DESKTOP=COSMIC を入れる)。
+  # home-manager 側が既に ConditionEnvironment = "WAYLAND_DISPLAY" を string で
+  # 定義しているため mkForce でリストに差し替える。同じ Condition* が複数行あると
+  # systemd は AND で評価するので「Wayland かつ COSMIC ではない」条件になる。
+  systemd.user.services.waybar.Unit.ConditionEnvironment = lib.mkForce [
+    "WAYLAND_DISPLAY"
+    "!XDG_CURRENT_DESKTOP=COSMIC"
+  ];
 }

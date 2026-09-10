@@ -3,6 +3,7 @@
     ./niri.nix
     ./hyprland.nix
     ./plasma.nix
+    ./cosmic.nix
     ./waybar.nix
     ./fuzzel.nix
     ./walker.nix

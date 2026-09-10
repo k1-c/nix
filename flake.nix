@@ -35,6 +35,17 @@
 
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
 
+    # ghostty 専用。COSMIC で frosted glass にするため upstream main を使う。
+    # リリース版 1.3.1 (nixpkgs 25.11 / unstable / cosmic pin すべて 1.3.1) の
+    # Wayland blur は旧 org_kde_kwin_blur_manager 専用実装だが、cosmic-comp 1.6.0 は
+    # このプロトコルを advertise せず新標準の ext_background_effect_manager_v1 のみを
+    # 出すため、COSMIC では background-blur が黙って無視される。
+    # main は ext-background-effect 実装済み (milestone 1.4.0, 未リリース)。
+    # 1.4.0 が nixpkgs に降りてきたらこの input を削って pkgs.ghostty に戻す。
+    # zig でソースビルドされ、上流が pin した nixpkgs で検証されているため
+    # follows は付けない (herdr と同じ隔離方針)。
+    ghostty.url = "github:ghostty-org/ghostty";
+
     # herdr (AI エージェント・マルチプレクサ) は nixpkgs 未収録のため公式 flake から取得。
     # 独自の nixpkgs + rust-overlay でソースビルドするため follows は付けない。
     herdr.url = "github:ogulcancelik/herdr";
