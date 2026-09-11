@@ -15,6 +15,7 @@ k1-c's NixOS configuration (flake). Manages multiple machines from a single flak
 ├── modules/               # NixOS modules (shared across hosts)
 │   └── desktop/           #   SDDM + Plasma / Niri / Hyprland
 └── home/k1nix/            # home-manager (user "k1nix")
+    ├── claude-code.nix    #   Claude Code + statusLine (repo / branch / Linear issue)
     └── desktop/           #   waybar / fuzzel / hyprlock etc.
 ```
 
