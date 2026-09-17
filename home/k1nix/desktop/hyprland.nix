@@ -25,6 +25,22 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
 
+    # xdg-desktop-portal-hyprland を home-manager 側から入れない。
+    #
+    # home-manager の hyprland module は portalPackage != null だと
+    # xdg.portal.enable = true にして xdph を user profile
+    # (/etc/profiles/per-user/k1nix/share/xdg-desktop-portal/portals) に置く。
+    # ところが xdg-desktop-portal 本体は XDG_DATA_DIRS を順に見て
+    # 「最初に見つかった portals ディレクトリ 1 つだけ」を読む実装なので、
+    # user profile 側が /run/current-system/sw/share/... を丸ごと隠してしまい、
+    # cosmic / kde / gnome / gtk の backend が全セッションで一切ロードされなくなる
+    # (COSMIC で cosmic-screenshot が PortalNotFound で死ぬ、FileChooser や
+    #  ScreenCast が生えない、等の原因がこれ)。
+    #
+    # xdph は modules/desktop/hyprland.nix の xdg.portal.extraPortals で
+    # システム側に既に入っているので、ここは null にして user profile を空にする。
+    portalPackage = null;
+
     settings = {
       "$mod" = mod;
 
