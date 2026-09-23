@@ -49,6 +49,15 @@
     # herdr (AI エージェント・マルチプレクサ) は nixpkgs 未収録のため公式 flake から取得。
     # 独自の nixpkgs + rust-overlay でソースビルドするため follows は付けない。
     herdr.url = "github:ogulcancelik/herdr";
+
+    # herdr-reviewr 専用。上流の rust-toolchain.toml が 1.97.0 を要求するが、
+    # nixos-25.11 の rustc は 1.91.1、nixpkgs-unstable でも 1.95.0 で足りない。
+    # herdr input が持つ rust-overlay も lock が古く 1.96.1 までしか無いため、
+    # ツールチェイン取得用に自前で pin する (overlay なので nixpkgs は follows でよい)。
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, nixpkgs-cosmic, home-manager, niri, plasma-manager, nix-claude-code, herdr, ... }@inputs:

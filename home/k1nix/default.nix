@@ -14,6 +14,7 @@
     ./claude-code.nix
     ./composio.nix
     ./terminal-browser.nix
+    ./herdr-reviewr.nix
     ./desktop
   ];
 
