@@ -27,6 +27,11 @@
 let
   version = "0.11.1";
 
+  # ページの既定拡大率。terminal-browser 本体に設定項目が無いので bundle を patch する。
+  # 実行時は Ctrl + = / - / 0 でプリセット (… 0.9 / 1 / 1.1 / 1.25 / 1.5 …) を上下できるが
+  # 値は保存されないので、起動時の初期値だけここで決める。
+  defaultZoom = "1.1";
+
   sources = {
     "x86_64-linux" = {
       asset = "terminal-browser-linux-x64.tar.gz";
@@ -107,6 +112,16 @@ let
       substituteInPlace browser/dist/main.js cli/dist/main.js \
         --replace-fail 'var suffix = import_node_crypto.default.createHash("sha256").update(stableIdentity(INSTALL_ROOT.root)).digest("hex").slice(0, 8);' \
                        'var suffix = "nixos";'
+
+      # ページを載せる BrowserWindow の webPreferences に zoomFactor を足して、
+      # 起動直後から ${defaultZoom} 倍で描画させる (Electron の既定は 1.0)。
+      # 呼び出し側が渡す webPreferences の手前に置くので、passthrough があればそちらが勝つ。
+      # 入力は sendInputEvent (ウィンドウ座標) なので、Ctrl + = で拡大したときと同じく
+      # クリック位置はズレない。
+      substituteInPlace browser/dist/main.js \
+        --replace-fail '          ...webPreferences,' \
+                       '          zoomFactor: ${defaultZoom},
+          ...webPreferences,'
     '';
 
     installPhase = ''
