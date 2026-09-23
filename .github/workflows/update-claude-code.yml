@@ -1,0 +1,46 @@
+name: update claude-code
+
+on:
+  schedule:
+    # 23:00 JST (14:00 UTC)。system.autoUpgrade が回る 00:05〜00:50 JST より前に
+    # main を更新しておき、その日の rebuild で最新の Claude Code が入るようにする。
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-claude-code
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      # 更新対象は nix-claude-code（と、その子 input の nixpkgs）だけ。
+      # 他の input は flake.nix のコメント通り意図して pin してあるので触らない。
+      - name: nix flake update nix-claude-code
+        run: nix flake update nix-claude-code
+
+      - name: commit & push
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet flake.lock; then
+            echo "nix-claude-code は最新。差分なし。"
+            exit 0
+          fi
+
+          # コミットメッセージに入れる claude のバージョン。取れなくても更新は続ける。
+          ref="$(jq -r '.nodes["nix-claude-code"].locked | "\(.owner)/\(.repo)/\(.rev)"' flake.lock)"
+          version="$(nix eval --raw "github:$ref#default.version")" || version=""
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "chore(flake): bump nix-claude-code${version:+ (claude $version)}"
+          git push
