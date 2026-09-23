@@ -13,9 +13,10 @@ let
     command = "cat | bash ~/.claude/statusline.sh";
   };
 
-  # コミットに Co-Authored-By trailer を付けさせない（空文字で無効化）。
+  # コミットの Co-Authored-By trailer と PR 本文の署名を付けさせない（空文字で無効化）。
   attribution = {
     commit = "";
+    pr = "";
   };
 in
 {
