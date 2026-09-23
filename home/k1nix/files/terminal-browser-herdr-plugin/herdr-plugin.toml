@@ -1,0 +1,25 @@
+# herdr のアクションメニューから terminal-browser を右 split で開くためのプラグイン。
+#
+# 上流 (zenbu-labs/terminal-browser の herdr-plugin/) をそのまま
+# `herdr plugin install` すると [[build]] で
+#   curl -fsSL https://terminal-browser.sh/install | bash
+# が走り、~/.local/share/terminal-browser に nix 管理外の実体が二重に入る。
+# NixOS では terminal-browser.nix が本体を入れるので、[[build]] を落とした
+# ローカルプラグインとして link する。
+#
+# min_herdr_version は上流と同じ 0.8.2 のまま。terminal-browser 本体が
+# `herdr pane split --right-click pane` (0.8.2 で追加) を使うので、実際に
+# それ未満の herdr では描画も split も動かない。
+id = "zenbu-labs.terminal-browser"
+name = "Terminal Browser"
+version = "0.1.1"
+min_herdr_version = "0.8.2"
+description = "Open a browser inside herdr"
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "open-split"
+title = "Open terminal-browser (right split)"
+description = "Split the focused pane and open terminal-browser in it"
+contexts = ["global"]
+command = ["bash", "open-split.sh"]

@@ -13,6 +13,7 @@
     ./gitui.nix
     ./claude-code.nix
     ./composio.nix
+    ./terminal-browser.nix
     ./desktop
   ];
 
