@@ -173,4 +173,22 @@ in
           || echo "terminal-browser: herdr plugin link に失敗しました。herdr 起動後に手動で実行してください: herdr plugin link ${herdrPluginDir}" >&2
       fi
     '';
+
+  # `terminal-browser action` は agent-browser (CDP ブリッジ) を常駐プロセスとして残す。
+  # これは PPID=1 で切り離されるのが正常な状態なので、switch で store path が変わっても
+  # 古い世代のものが誰にも回収されずに生き続ける (1 プロセス 25〜200MB)。
+  # 現行世代 *以外* のものだけを落とす。daemon / renderer / gpu-process は herdr の
+  # ペインで表示中のセッション本体なので対象外。
+  home.activation.terminalBrowserReapStaleAgents =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      ${pkgs.procps}/bin/ps -eo pid=,ppid=,args= | while read -r pid ppid args; do
+        [ "$ppid" = 1 ] || continue
+        case "$args" in
+          ${terminal-browser}/*) continue ;;
+          /nix/store/*-terminal-browser-*/libexec/terminal-browser/agent-browser/bin/agent-browser*) ;;
+          *) continue ;;
+        esac
+        run kill "$pid" 2>/dev/null || true
+      done
+    '';
 }
