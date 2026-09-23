@@ -119,12 +119,52 @@ command = ["bash", "herdr/install.sh"]
   # nix からは reviewrPlugin を直接渡す。home.file に置くのは、この安定パスを
   # 人間に提供するためと、generation から derivation を参照して GC から守るため。
   herdrPluginDir = "${config.home.homeDirectory}/.local/share/herdr-plugins/reviewr";
+
+  # toggle アクションに割り当てるキー。herdr の prefix (既定 ctrl+b) 経由にする。
+  #   - 上流 README は `cmd+r` を例示するが、cmd/command/super はどれも KeyModifiers::SUPER
+  #     に解決される (src/config/keybinds.rs の parse_modifier_token)。mac 前提の表記で、
+  #     Linux では Super = WM の修飾キーなので herdr まで届かない。
+  #   - prefix+r は resize_mode、prefix+shift+r は reload_config が既定で使っている
+  #     (src/config/model.rs の KeysConfig::default)。空いている d (diff) を採る。
+  #   - tmux の prefix は C-j なので ctrl+b とは衝突しない。
+  toggleKey = "prefix+d";
+
+  # config.toml のうち nix が管理する範囲。マーカーで囲んで activation が入れ替える。
+  # TOML では [[table]] ヘッダが直前のテーブルを必ず閉じるため、末尾に足す限り安全。
+  keybindMarkerBegin = "# >>> nix: herdr-reviewr >>>";
+  keybindMarkerEnd = "# <<< nix: herdr-reviewr <<<";
+  keybindBlock = ''
+    ${keybindMarkerBegin}
+    [[keys.command]]
+    key = "${toggleKey}"
+    type = "plugin_action"
+    command = "persiyanov.reviewr.toggle"
+    description = "reviewr: toggle pane"
+    ${keybindMarkerEnd}
+  '';
+
+  herdrConfig = "${config.home.homeDirectory}/.config/herdr/config.toml";
+
+  # reviewr 自身の設定。herdr の config.toml とは別ファイルで、herdr 側に書いた設定は
+  # 一切届かない。読み取り専用 (書き込みは src/config.rs のテストにしか無い) なので
+  # herdr の config.toml と違って home.file で丸ごと管理できる。
+  # 置き場所は herdr が HERDR_PLUGIN_CONFIG_DIR で渡すディレクトリ = plugins/config/<plugin_id>。
+  #
+  # 起動タブ (Changes / All files / PR) は設定キーが無く src/app.rs の
+  # `tab: Tab::Changes` 固定なので、All files を見たいときは起動後に `2` を押す。
+  reviewrConfig = ''
+    # ファイルツリーを左に置く (既定は right)。`p` で時計回りに回せる。
+    navigator_position = "left"
+  '';
 in
 {
   # herdr の外からも `herdr-reviewr <repo>` で単体起動できる。
   home.packages = [ herdr-reviewr ];
 
   home.file.".local/share/herdr-plugins/reviewr".source = reviewrPlugin;
+
+  home.file.".config/herdr/plugins/config/persiyanov.reviewr/config.toml".text =
+    reviewrConfig;
 
   # herdr 側のプラグイン登録だけは ~/.config/herdr/plugins.json への書き込みなので
   # 宣言的にできない。
@@ -147,6 +187,40 @@ in
       if [ "$have" != "$want" ]; then
         run ${herdr}/bin/herdr plugin link "$want" > /dev/null \
           || echo "herdr-reviewr: herdr plugin link に失敗しました。herdr 起動後に手動で実行してください: herdr plugin link ${herdrPluginDir}" >&2
+      fi
+    '';
+
+  # herdr の config.toml は herdr 自身も書き換えるので (onboarding フラグ、設定 UI の
+  # テーマ変更など: src/config/write.rs)、home.file で store の read-only symlink に
+  # すると設定 UI の保存が失敗する。nix のブロックだけを毎回入れ替える。
+  home.activation.herdrReviewrKeybinding =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      cfg=${lib.escapeShellArg herdrConfig}
+      block=${lib.escapeShellArg keybindBlock}
+
+      # 既存の nix ブロックを落とす。$(...) が末尾の改行を落とすので、
+      # switch のたびに空行が増えることはない。
+      if [ -e "$cfg" ]; then
+        rest=$(sed ${lib.escapeShellArg "/^${keybindMarkerBegin}$/,/^${keybindMarkerEnd}$/d"} "$cfg")
+      else
+        rest=""
+      fi
+
+      if [ -n "$rest" ]; then
+        merged=$(printf '%s\n\n%s' "$rest" "$block")
+      else
+        merged=$(printf '%s' "$block")
+      fi
+
+      # リダイレクトは DRY_RUN_CMD を通せない (シェルが先に実行してしまう) ので、
+      # 一時ファイルに書いてから run で置く。
+      if [ ! -e "$cfg" ] || ! printf '%s\n' "$merged" | cmp -s - "$cfg"; then
+        tmp=$(mktemp)
+        printf '%s\n' "$merged" > "$tmp"
+        run mkdir -p "$(dirname "$cfg")"
+        run install -m644 "$tmp" "$cfg"
+        rm -f "$tmp"
+        verboseEcho "herdr-reviewr: ${toggleKey} を $cfg に書き込みました"
       fi
     '';
 }
