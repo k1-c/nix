@@ -114,8 +114,10 @@ command = ["bash", "herdr/install.sh"]
                      'export PATH="${runtimePath}:''${PATH:-}"'
   '';
 
-  # `herdr plugin link` はここに書いたパスをそのまま記録するので、store 直指定ではなく
-  # home.file が張る安定パスを渡す (更新のたびに link し直さずに済む)。
+  # 手で link し直すとき用の安定パス。`herdr plugin link` に渡しても結局
+  # canonicalize されて store の実体が記録されるので (下の activation 参照)、
+  # nix からは reviewrPlugin を直接渡す。home.file に置くのは、この安定パスを
+  # 人間に提供するためと、generation から derivation を参照して GC から守るため。
   herdrPluginDir = "${config.home.homeDirectory}/.local/share/herdr-plugins/reviewr";
 in
 {
@@ -124,12 +126,26 @@ in
 
   home.file.".local/share/herdr-plugins/reviewr".source = reviewrPlugin;
 
-  # herdr 側のプラグイン登録だけは ~/.config/herdr/.plugins.lock への書き込みなので
-  # 宣言的にできない。未登録のときだけ link する (失敗しても switch は止めない)。
+  # herdr 側のプラグイン登録だけは ~/.config/herdr/plugins.json への書き込みなので
+  # 宣言的にできない。
+  #
+  # 「未登録なら link」では不足する。`herdr plugin link` は渡されたパスを canonicalize して
+  # 実体を記録するので (src/app/api/plugins/manifest.rs の load_plugin_manifest)、登録された
+  # plugin_root は常に store の実パスになる。version を上げても登録自体は残っているため
+  # 再 link されず、古い store パスを指したまま GC で消えて壊れる。
+  # 記録されたルートが今の derivation と一致するかで判定する。
+  #
+  # link は plugin_id をキーにした insert なので (handle_plugin_link)、上書きに unlink は要らない。
+  # list / link はどちらもサーバ停止中でもオフライン経路で動く。
   home.activation.herdrReviewrPlugin =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if ! ${herdr}/bin/herdr plugin list 2>/dev/null | grep -q 'persiyanov.reviewr'; then
-        run ${herdr}/bin/herdr plugin link ${lib.escapeShellArg herdrPluginDir} > /dev/null \
+      want=${reviewrPlugin}
+      have=$(${herdr}/bin/herdr plugin list --plugin persiyanov.reviewr --json 2>/dev/null \
+        | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "persiyanov.reviewr") | .plugin_root' \
+        2>/dev/null) || have=""
+
+      if [ "$have" != "$want" ]; then
+        run ${herdr}/bin/herdr plugin link "$want" > /dev/null \
           || echo "herdr-reviewr: herdr plugin link に失敗しました。herdr 起動後に手動で実行してください: herdr plugin link ${herdrPluginDir}" >&2
       fi
     '';
