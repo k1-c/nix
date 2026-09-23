@@ -29,7 +29,7 @@
 #       (または linear-tui auth token <personal-api-key>)
 #   - API キーは秘密情報なのでこのリポジトリには置かない。
 let
-  version = "0.1.3";
+  version = "0.3.0";
 
   linear-tui = pkgs.rustPlatform.buildRustPackage {
     pname = "linear-tui";
@@ -39,10 +39,10 @@ let
       owner = "k1-c";
       repo = "linear-tui";
       tag = "v${version}";
-      hash = "sha256-T0WclBcg7XVVNoxhPrT1DLgeCa3zH9dWovtNkBCA+QE=";
+      hash = "sha256-LVIPv8Px0yy/XL0AdRj1cC12gj52yjUGdC0z+43z2OE=";
     };
 
-    cargoHash = "sha256-Om5tfeB2/87+NP8BKyNoJD8D+bfPaKHsQfY6R/sNy2M=";
+    cargoHash = "sha256-kjUVmdPP/3IlhXx1QHQB22uO52a99BLPJqkQW2SbhB4=";
 
     nativeBuildInputs = [ pkgs.pkg-config pkgs.makeWrapper ];
     buildInputs = [ pkgs.openssl ];
