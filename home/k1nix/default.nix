@@ -15,6 +15,7 @@
     ./composio.nix
     ./terminal-browser.nix
     ./herdr-reviewr.nix
+    ./linear-tui.nix
     ./desktop
   ];
 
