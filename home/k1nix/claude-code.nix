@@ -18,6 +18,11 @@ let
     commit = "";
     pr = "";
   };
+
+  # 応答言語。Claude Code はこの値をそのまま「常にこの言語で応答する」指示として
+  # Claude に渡す（綴りの検証はされない）。コミットや PR を英語で書く作業が長く
+  # 続いても、会話の言語が英語に流れないようにする。
+  language = "japanese";
 in
 {
   programs.claude-code = {
@@ -27,7 +32,7 @@ in
     # settings は意図的に空のままにする。programs.claude-code.settings を設定すると
     # ~/.claude/settings.json が store への読み取り専用 symlink になり、Claude Code
     # 自身の書き込み（enabledPlugins / autoMode / feedbackSurveyState、/config や
-    # /statusline）が全部失敗する。statusLine と attribution だけ下の activation でマージして入れる。
+    # /statusline）が全部失敗する。statusLine / attribution / language だけ下の activation でマージして入れる。
   };
 
   # store への symlink になる。変更するときは files/claude-statusline.sh を編集して
@@ -39,22 +44,22 @@ in
   # statusline が毎描画で使う（packages.nix にも入っているが依存として明示する）
   home.packages = [ pkgs.jq ];
 
-  # statusLine と attribution の項だけを冪等にマージする。他のキーとファイルの権限は保つ。
+  # statusLine / attribution / language の項だけを冪等にマージする。他のキーとファイルの権限は保つ。
   home.activation.claudeCodeSettings =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       claudeDir="$HOME/.claude"
       settings="$claudeDir/settings.json"
-      desired=${lib.escapeShellArg (builtins.toJSON { inherit statusLine attribution; })}
+      desired=${lib.escapeShellArg (builtins.toJSON { inherit statusLine attribution language; })}
 
       run mkdir -p "$claudeDir"
 
       if [ -e "$settings" ] && ! ${pkgs.jq}/bin/jq -e . "$settings" > /dev/null 2>&1; then
-        echo "claude-code: $settings が妥当な JSON ではないため statusLine / attribution の設定を見送りました" >&2
+        echo "claude-code: $settings が妥当な JSON ではないため statusLine / attribution / language の設定を見送りました" >&2
       else
         tmp="$(${pkgs.coreutils}/bin/mktemp)"
 
         if [ -s "$settings" ]; then
-          ${pkgs.jq}/bin/jq --argjson d "$desired" '.statusLine = $d.statusLine | .attribution = ((.attribution // {}) + $d.attribution)' "$settings" > "$tmp"
+          ${pkgs.jq}/bin/jq --argjson d "$desired" '.statusLine = $d.statusLine | .attribution = ((.attribution // {}) + $d.attribution) | .language = $d.language' "$settings" > "$tmp"
         else
           ${pkgs.jq}/bin/jq -n --argjson d "$desired" '$d' > "$tmp"
         fi
@@ -62,7 +67,7 @@ in
         if ${pkgs.coreutils}/bin/cmp -s "$tmp" "$settings" 2> /dev/null; then
           : # 差分なし
         elif [ -n "''${DRY_RUN_CMD:-}" ]; then
-          echo "would set statusLine / attribution in $settings"
+          echo "would set statusLine / attribution / language in $settings"
         elif [ -e "$settings" ]; then
           # inode と権限を保つため、install ではなく上書きコピーする
           ${pkgs.coreutils}/bin/cat "$tmp" > "$settings"
