@@ -10,10 +10,12 @@ k1-c's NixOS configuration (flake). Manages multiple machines from a single flak
 .
 ├── flake.nix              # flake entry / nixosConfigurations
 ├── hosts/                 # per-machine config
-│   ├── insomnia/          #   main desktop (NVIDIA + Intel NPU)
-│   └── dwarf/             #   secondary desktop (Intel iGPU)
+│   ├── daiv/              #   main desktop (NVIDIA RTX 5070 Ti, Windows dual boot)
+│   ├── insomnia/          #   sub desktop (NVIDIA + Intel NPU)
+│   ├── dwarf/             #   sub desktop (Intel iGPU)
+│   └── mind/              #   sub desktop (Intel iGPU + DisplayLink)
 ├── modules/               # NixOS modules (shared across hosts)
-│   └── desktop/           #   SDDM + Plasma / Niri / Hyprland
+│   └── desktop/           #   SDDM + COSMIC (default) / Plasma / Niri / Hyprland
 └── home/k1nix/            # home-manager (user "k1nix")
     ├── claude-code.nix    #   Claude Code + statusLine (repo / branch / Linear issue)
     └── desktop/           #   waybar / fuzzel / hyprlock etc.
@@ -21,10 +23,14 @@ k1-c's NixOS configuration (flake). Manages multiple machines from a single flak
 
 ## Hosts
 
-| host     | CPU/GPU                 | role        |
-| -------- | ----------------------- | ----------- |
-| insomnia | Intel + NVIDIA RTX 3070 | sub desktop |
-| dwarf    | Intel + iGPU            | sub desktop |
+| host     | CPU/GPU                              | role         |
+| -------- | ------------------------------------ | ------------ |
+| daiv     | i9-13900KF + NVIDIA RTX 5070 Ti      | main desktop |
+| insomnia | Intel + NVIDIA RTX 3070              | sub desktop  |
+| dwarf    | Intel + iGPU                         | sub desktop  |
+| mind     | Intel + iGPU (DisplayLink dock)      | sub desktop  |
+
+`daiv` notes: Intel VMD is enabled on this board (keep `vmd` in the initrd; do **not** disable VMD in BIOS or the Windows install on the other NVMe stops booting). Windows lives on a separate ESP, so it is picked from the firmware boot menu; see `hosts/daiv/default.nix` for the optional systemd-boot entry.
 
 Both hosts share a single user account `k1nix`. Initial password is `password` (see below).
 
@@ -32,7 +38,8 @@ Both hosts share a single user account `k1nix`. Initial password is `password` (
 
 Pick at login via SDDM:
 
-- **Plasma** (Wayland) — default. Liquid Glass-ish look (KWin Blur + Background Contrast + `kde-rounded-corners`, transparent panel). Walker bound to `Meta+Return` / `Meta+D`. Animated wallpaper via `plasma-smart-video-wallpaper-reborn` (drop a file at `~/.config/wallpaper/animated.mp4`).
+- **COSMIC** (Wayland) — default on every host. Uses COSMIC 1.6 from `nixos-unstable` (see `modules/desktop/cosmic.nix`) for Frosted Glass. Untested on the NVIDIA hosts as of 2026-09; if it fails to start, pick Plasma from SDDM.
+- **Plasma** (Wayland) — Liquid Glass-ish look (KWin Blur + Background Contrast + `kde-rounded-corners`, transparent panel). Walker bound to `Meta+Return` / `Meta+D`. Animated wallpaper via `plasma-smart-video-wallpaper-reborn` (drop a file at `~/.config/wallpaper/animated.mp4`).
 - **Niri** (Wayland, scrollable tiling)
 - **Hyprland** (Wayland, dynamic tiling)
 
