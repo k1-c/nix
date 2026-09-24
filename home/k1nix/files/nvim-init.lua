@@ -91,7 +91,8 @@ require("lazy").setup({
   {
     "eero-lehtinen/oklch-color-picker.nvim",
     event = "VeryLazy",
-    version = "*",
+    -- v5 requires Neovim 0.12+; nixpkgs still ships 0.11.
+    version = "4.*",
     keys = {
       -- One handed keymap recommended, you will be using the mouse
       {
