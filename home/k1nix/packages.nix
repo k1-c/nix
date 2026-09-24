@@ -54,6 +54,11 @@
     xvfb-run         # headless 用の仮想 X サーバ (`xvfb-run drawio -x ...`)
     chromium
 
+    # Terminal recording (VHS の .tape から GIF/MP4 を生成。ttyd / ffmpeg は vhs が実行時に要求)
+    vhs
+    ttyd
+    ffmpeg
+
     # Build toolchain (needed by lazy.nvim build steps, e.g. telescope-fzf-native)
     gcc
     gnumake
