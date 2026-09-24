@@ -14,7 +14,7 @@
     # 現 stable の nixos-26.05 でも 1.2.0 で未搭載。nixos-unstable だけが
     # 1.6.0 を持つ。nixpkgs-unstable 自体を上げると niri が壊れる (下の
     # 1Password overlay のコメント参照) ので、mise と同じく COSMIC だけ
-    # 別 input に隔離して影響範囲を mind ホストに閉じ込める。
+    # 別 input に隔離して影響範囲を COSMIC 一式に閉じ込める (全ホスト共通)。
     nixpkgs-cosmic.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {

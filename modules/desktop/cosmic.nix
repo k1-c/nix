@@ -69,9 +69,9 @@ in
     pkgs-cosmic.cosmic-sound-theme
   ];
 
-  # NOTE: cosmic-greeter は入れない。SDDM のセッション一覧に "COSMIC" が
-  # 増えるだけで、defaultSession は modules/desktop/common.nix の "plasma"
-  # のまま。COSMIC はログイン時に明示的に選ぶ運用にする。
+  # NOTE: cosmic-greeter は入れない。ログインは引き続き SDDM で、
+  # modules/desktop/common.nix の defaultSession = "cosmic" により既定で COSMIC が
+  # 選ばれる。Plasma / Niri / Hyprland はセッション選択で手動切り替え。
   #
   # NOTE: Frosted Glass (COSMIC 1.3+) はコンパイル時フラグではなく実行時設定。
   # 有効化は COSMIC セッションにログインしてから
@@ -79,7 +79,8 @@ in
   # オーバービュー / OSD ごとに frost の厚みと不透明度を調整する。
   #
   # NOTE: cosmic-comp は unstable 側の mesa にリンクするが、実際の GPU driver は
-  # system 側 (25.11) の /run/opengl-driver から来る世代混在構成。mind は
-  # Intel iGPU なので EGL/GBM の ABI 差で問題が出にくい前提で入れている。
-  # NVIDIA 機 (insomnia) に広げる時はここが最初の疑い所。
+  # system 側 (25.11) の /run/opengl-driver から来る世代混在構成。mind (Intel iGPU)
+  # では EGL/GBM の ABI 差で問題が出ていない。2026-09 に全ホスト共通化したが、
+  # NVIDIA 機 (insomnia / daiv) は未検証なので、COSMIC が起動しない時はここが最初の疑い所。
+  # その場合は SDDM で Plasma を選べばログインはできる。
 }

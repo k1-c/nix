@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  # Plasma と Niri を SDDM で切り替えて並行運用する前提の共通設定。
+  # COSMIC (既定) / Plasma / Niri / Hyprland を SDDM で切り替えて並行運用する前提の共通設定。
   services.xserver = {
     enable = true;
     xkb = {
@@ -20,9 +20,11 @@
       # 一切表示されなくなる (gen 20 の症状)。X11 greeter に固定して回避する。
       wayland.enable = false;
     };
-    # ブラックアウト等で Niri が死んでも、再ログイン時は必ず Plasma が初期選択になるように固定。
-    # Niri を使いたい時は SDDM のセッション選択で手動で切り替える。
-    defaultSession = "plasma";
+    # 既定は COSMIC (全ホスト共通)。ブラックアウト等でセッションが死んでも、再ログイン時は
+    # 必ず COSMIC が初期選択になるように固定する。Plasma / Niri / Hyprland を使いたい時は
+    # SDDM のセッション選択で手動で切り替える。セッション名は cosmic-session の
+    # wayland-sessions/cosmic.desktop に由来する。
+    defaultSession = "cosmic";
   };
 
   # Chromium / Electron 系 (google-chrome / chromium / slack / vscode 等) を
