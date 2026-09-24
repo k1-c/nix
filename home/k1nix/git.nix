@@ -1,5 +1,18 @@
 { pkgs, ... }:
 
+let
+  # `gh auth git-credential` always answers with gh's *active* account, so
+  # pick the account explicitly per directory instead.
+  ghCredential = user:
+    "!f() { test \"$1\" = get || exit 0; echo username=${user}; echo \"password=$(${pkgs.gh}/bin/gh auth token --hostname github.com --user ${user})\"; }; f";
+
+  # Credential helpers accumulate across includes; "" clears the inherited list,
+  # so ~/.gitconfig.local can override the account per directory the same way.
+  credentialsFor = user: {
+    "credential \"https://github.com\"".helper = [ "" (ghCredential user) ];
+    "credential \"https://gist.github.com\"".helper = [ "" (ghCredential user) ];
+  };
+in
 {
   programs.git = {
     enable = true;
@@ -40,8 +53,6 @@
       help.autocorrect = 1;
       init.defaultBranch = "main";
       push.default = "current";
-      "credential \"https://github.com\"".helper = "!${pkgs.gh}/bin/gh auth git-credential";
-      "credential \"https://gist.github.com\"".helper = "!${pkgs.gh}/bin/gh auth git-credential";
-    };
+    } // credentialsFor "k1-c";
   };
 }

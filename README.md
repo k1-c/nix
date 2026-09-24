@@ -167,6 +167,51 @@ sudo nixos-rebuild switch --rollback
 
 ---
 
+## Git: per-directory GitHub accounts
+
+`home/k1nix/git.nix` only holds the personal identity. Work identities stay out of this public repo and live in untracked files under `~`, selected by where ghq clones the repo (`~/dev/git/github.com/<owner>/<repo>`).
+
+- **Base config (tracked).** HTTPS credentials come from gh, pinned to the personal account with `gh auth token --user k1-c`. `gh auth git-credential` is not used, because it always answers with gh's *active* account, whichever one `gh auth switch` last picked.
+- **`~/.gitconfig.local` (untracked).** The base config includes it. It maps an owner directory to a per-account file:
+
+  ```gitconfig
+  [includeIf "gitdir:~/dev/git/github.com/<org>/"]
+  	path = ~/.gitconfig.<org>
+  ```
+
+- **`~/.gitconfig.<org>` (untracked).** Overrides the identity and the credential helper:
+
+  ```gitconfig
+  [user]
+  	name = <name>
+  	email = <work-email>
+
+  # The empty value clears the inherited (personal) helper; without it git
+  # would still try the personal token first.
+  [credential "https://github.com"]
+  	helper =
+  	helper = "!f() { test \"$1\" = get || exit 0; echo username=<work-account>; echo \"password=$(gh auth token --hostname github.com --user <work-account>)\"; }; f"
+  ```
+
+To add an account, run `gh auth login` for it (both accounts stay logged in; `gh auth status` lists them), then add an `includeIf` + file pair. Check it from inside a clone:
+
+```sh
+git config --show-origin --get-all user.email
+git config --show-origin --get-all credential.https://github.com.helper
+```
+
+Caveats:
+
+- `includeIf "gitdir:..."` only matches inside an existing repo. Before the first clone, `ghq get` uses the base (personal) credentials. For a private work repo the personal account cannot read, force the include for the clone:
+
+  ```sh
+  GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=include.path GIT_CONFIG_VALUE_0=~/.gitconfig.<org> \
+    ghq get <org>/<repo>
+  ```
+- This only switches **git**. The `gh` CLI itself (`gh pr create`, …) still uses the active account, so run `gh auth switch` or set `GH_TOKEN` when working on those repos.
+
+---
+
 ## Security note
 
 `hosts/{insomnia,dwarf}/default.nix` ships with a hardcoded `initialPassword = "password"`.
