@@ -103,16 +103,16 @@
     "linear-tui": {
       "flake": false,
       "locked": {
-        "lastModified": 1790197875,
-        "narHash": "sha256-h4ZycLECN6fOdzJML/2j2er+qKr6l1jQku0/M6+bdtM=",
+        "lastModified": 1790250027,
+        "narHash": "sha256-lE8aDol4G6zGIwUJgavOxUV4kkgNAEpiq917zo/jRsg=",
         "owner": "k1-c",
         "repo": "linear-tui",
-        "rev": "aa6eec0e49957738197ad7d9dd7d36fdd67da7d0",
+        "rev": "ad0bc12ca27a384b23aa586eec7cb0e33a3e8b96",
         "type": "github"
       },
       "original": {
         "owner": "k1-c",
-        "ref": "v0.4.0",
+        "ref": "v0.5.1",
         "repo": "linear-tui",
         "type": "github"
       }
