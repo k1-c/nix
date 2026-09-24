@@ -1,0 +1,64 @@
+name: update linear-tui
+
+on:
+  schedule:
+    # 22:50 JST (13:50 UTC)。system.autoUpgrade が回る 00:05〜00:50 JST より前、
+    # かつ update-claude-code (23:00 JST) と push がぶつからない時刻にずらしてある。
+    - cron: "50 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-linear-tui
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      # main ではなく最新リリースのタグに追随する (未リリースの変更は入れない)。
+      - name: resolve latest release
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(gh api repos/k1-c/linear-tui/releases/latest --jq .tag_name)"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "unexpected tag: $tag"; exit 1; }
+          current="$(grep -oP 'github:k1-c/linear-tui/\Kv[0-9.]+' flake.nix)"
+          echo "current=$current latest=$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
+      - name: bump flake input
+        if: steps.latest.outputs.tag != steps.latest.outputs.current
+        run: |
+          set -euo pipefail
+          sed -i "s|github:k1-c/linear-tui/${{ steps.latest.outputs.current }}|github:k1-c/linear-tui/${{ steps.latest.outputs.tag }}|" flake.nix
+          nix flake update linear-tui
+
+      # 上流の rust-version が nixpkgs の rustc を超えた等で壊れた版は push しない。
+      # linear-tui だけをビルドし、全ホストの eval も通ることを確認する。
+      - name: build linear-tui
+        if: steps.latest.outputs.tag != steps.latest.outputs.current
+        run: |
+          nix build --impure --no-link -L --expr '
+            let c = (builtins.getFlake (toString ./.)).nixosConfigurations.mind.config.home-manager.users.k1nix;
+            in builtins.head (builtins.filter (p: (p.pname or "") == "linear-tui") c.home.packages)'
+          nix flake check --no-build
+
+      - name: commit & push
+        if: steps.latest.outputs.tag != steps.latest.outputs.current
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flake.nix flake.lock
+          git commit -m "chore(flake): bump linear-tui to ${{ steps.latest.outputs.tag }}"
+          git pull --rebase
+          git push

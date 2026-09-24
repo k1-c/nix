@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 
 # linear-tui (k1-c/linear-tui) — Linear.app の TUI クライアント。
 #
@@ -9,10 +9,13 @@
 #     herdr-reviewr.nix と違って rust-overlay は要らない。
 #
 # 運用:
-#   - bump 時は version / hash / cargoHash を更新する。
-#     hash:      nix-prefetch-url --unpack https://github.com/k1-c/linear-tui/archive/refs/tags/v<ver>.tar.gz \
-#                  | xargs nix hash convert --hash-algo sha256 --to sri
-#     cargoHash: いったん lib.fakeHash に差し替えて build し、エラーの got を写す。
+#   - ソースは flake input `linear-tui` (リリースタグ pin, flake = false)。
+#     .github/workflows/update-linear-tui.yml が毎日最新リリースを見て、
+#     flake.nix のタグと flake.lock を更新して main に push する。手動 bump は不要。
+#     手で上げるなら flake.nix の url のタグを書き換えて `nix flake update linear-tui`。
+#   - version は上流の Cargo.toml から、依存は Cargo.lock から直接読むので
+#     src hash / cargoHash の更新は要らない (Cargo.lock に git 依存が入ったら
+#     cargoLock.outputHashes が必要になる)。
 #
 # 仕組み:
 #   - reqwest 0.12 が default-tls (native-tls → openssl) なので openssl と
@@ -29,20 +32,14 @@
 #       (または linear-tui auth token <personal-api-key>)
 #   - API キーは秘密情報なのでこのリポジトリには置かない。
 let
-  version = "0.3.0";
+  src = inputs.linear-tui;
 
   linear-tui = pkgs.rustPlatform.buildRustPackage {
     pname = "linear-tui";
-    inherit version;
+    inherit ((lib.importTOML "${src}/Cargo.toml").package) version;
+    inherit src;
 
-    src = pkgs.fetchFromGitHub {
-      owner = "k1-c";
-      repo = "linear-tui";
-      tag = "v${version}";
-      hash = "sha256-LVIPv8Px0yy/XL0AdRj1cC12gj52yjUGdC0z+43z2OE=";
-    };
-
-    cargoHash = "sha256-kjUVmdPP/3IlhXx1QHQB22uO52a99BLPJqkQW2SbhB4=";
+    cargoLock.lockFile = "${src}/Cargo.lock";
 
     nativeBuildInputs = [ pkgs.pkg-config pkgs.makeWrapper ];
     buildInputs = [ pkgs.openssl ];

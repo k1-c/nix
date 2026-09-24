@@ -100,6 +100,23 @@
         "type": "github"
       }
     },
+    "linear-tui": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790197875,
+        "narHash": "sha256-h4ZycLECN6fOdzJML/2j2er+qKr6l1jQku0/M6+bdtM=",
+        "owner": "k1-c",
+        "repo": "linear-tui",
+        "rev": "aa6eec0e49957738197ad7d9dd7d36fdd67da7d0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "k1-c",
+        "ref": "v0.4.0",
+        "repo": "linear-tui",
+        "type": "github"
+      }
+    },
     "niri": {
       "inputs": {
         "niri-stable": "niri-stable",
@@ -329,6 +346,7 @@
         "ghostty": "ghostty",
         "herdr": "herdr",
         "home-manager": "home-manager_2",
+        "linear-tui": "linear-tui",
         "niri": "niri",
         "nix-claude-code": "nix-claude-code",
         "nixpkgs": "nixpkgs_4",

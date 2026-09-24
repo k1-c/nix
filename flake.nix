@@ -54,6 +54,14 @@
     # nixos-25.11 の rustc は 1.91.1、nixpkgs-unstable でも 1.95.0 で足りない。
     # herdr input が持つ rust-overlay も lock が古く 1.96.1 までしか無いため、
     # ツールチェイン取得用に自前で pin する (overlay なので nixpkgs は follows でよい)。
+    # linear-tui (自作 TUI) のソース。nixpkgs 未収録なので home/k1nix/linear-tui.nix で
+    # ビルドする。リリースタグに pin し、.github/workflows/update-linear-tui.yml が
+    # 最新リリースのタグへ書き換えて lock を更新する (手で触る必要はない)。
+    linear-tui = {
+      url = "github:k1-c/linear-tui/v0.4.0";
+      flake = false;
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
