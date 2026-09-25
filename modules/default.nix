@@ -14,5 +14,6 @@
     ./zsh.nix
     ./docker.nix
     ./tailscale.nix
+    ./sleep-freeze-diag.nix
   ];
 }
