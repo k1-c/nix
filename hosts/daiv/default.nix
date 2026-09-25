@@ -19,16 +19,37 @@
   boot.initrd.availableKernelModules = [ "vmd" ];
 
   # 同じ機体の別 NVMe (nvme0n1) に Windows 11 が入っている。Windows の ESP は
-  # 別ディスクなので systemd-boot は自動では拾わないが、ファームウェアの
-  # ブートメニューからは常に選べる (efibootmgr に "Windows Boot Manager" がある)。
-  # systemd-boot のメニューにも出したい場合は、下の EFI Shell を起動して
-  # `map -c` で Windows の ESP のハンドル (HD0b / FS1 など) を調べ、
-  # windows エントリのコメントを外して埋める。
+  # 別ディスクなので systemd-boot は自動では拾わない。
+  # nixpkgs の boot.loader.systemd-boot.windows は EFI Shell のデバイスハンドル
+  # (HD0b / FS1 など) を固定で要求するが、ハンドルは Shell 起動時に採番される
+  # ので Linux 側からは分からず、ディスク構成が変わるとずれる。代わりに
+  # Windows 起動専用の EFI Shell を置き、FS0: 〜 FS9: から bootmgfw.efi を
+  # 探して最初に見つかったものを起動する。
+  # EDK2 Shell は shell.efi と同じディレクトリの startup.nsh を最初に実行する
+  # (ShellPkg/Application/Shell/Shell.c の LocateStartupScript)。
+  # 通常の EFI Shell (efi/edk2-uefi-shell/) と同じ場所に置くと、そちらを
+  # 開いた時まで Windows が起動してしまうので、ディレクトリを分けている。
+  # -nointerrupt は startup.nsh 前の待ち時間を 0 にする。-nomap を付けると
+  # FSn: が作られずに探索できないので付けない。
   boot.loader.systemd-boot.edk2-uefi-shell.enable = true;
-  # boot.loader.systemd-boot.windows."11" = {
-  #   title = "Windows 11";
-  #   efiDeviceHandle = "FIXME"; # EFI Shell の `map -c` で確認したハンドル
-  # };
+  boot.loader.systemd-boot.extraFiles = {
+    "efi/windows/shell.efi" = "${pkgs.edk2-uefi-shell}/shell.efi";
+    "efi/windows/startup.nsh" = pkgs.writeText "startup.nsh" ''
+      @echo -off
+      for %i run (0 9)
+        if exist FS%i:\EFI\Microsoft\Boot\bootmgfw.efi then
+          FS%i:\EFI\Microsoft\Boot\bootmgfw.efi
+        endif
+      endfor
+      echo "Windows Boot Manager (\EFI\Microsoft\Boot\bootmgfw.efi) not found on FS0-FS9"
+    '';
+  };
+  boot.loader.systemd-boot.extraEntries."windows.conf" = ''
+    title Windows 11
+    efi /efi/windows/shell.efi
+    options -nointerrupt -noversion
+    sort-key o_windows
+  '';
 
   # メモリ 32GB。Ubuntu 時代は 8GB の swap を常に使い切っていたので大きめに取る。
   # README の手順 1 は swap パーティションを切らないので swap ファイルにする。
