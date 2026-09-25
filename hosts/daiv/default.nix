@@ -42,12 +42,6 @@
   # Steam / Proton が要求する値 (Ubuntu 24.04 の既定と同じ)。
   boot.kernel.sysctl."vm.max_map_count" = 1048576;
 
-  # Ubuntu 時代の /etc/hosts を引き継ぐ。
-  networking.extraHosts = ''
-    127.0.0.1 twitter.com
-    127.0.0.1 x.com
-  '';
-
   users.users.k1nix = {
     isNormalUser = true;
     description = "k1nix";
