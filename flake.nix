@@ -58,7 +58,7 @@
     # ビルドする。リリースタグに pin し、.github/workflows/update-linear-tui.yml が
     # 最新リリースのタグへ書き換えて lock を更新する (手で触る必要はない)。
     linear-tui = {
-      url = "github:k1-c/linear-tui/v0.5.2";
+      url = "github:k1-c/linear-tui/v0.7.0";
       flake = false;
     };
 

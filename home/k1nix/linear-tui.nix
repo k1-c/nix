@@ -43,6 +43,8 @@ let
 
     nativeBuildInputs = [ pkgs.pkg-config pkgs.makeWrapper ];
     buildInputs = [ pkgs.openssl ];
+    # snapshot のテストが一時ディレクトリで git init / worktree add を叩く。
+    nativeCheckInputs = [ pkgs.git ];
 
     postInstall = ''
       wrapProgram $out/bin/linear-tui \
