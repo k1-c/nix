@@ -12,19 +12,13 @@
     # COSMIC 専用。Frosted Glass は COSMIC 1.3 で入った機能だが、nixpkgs
     # nixos-25.11 は cosmic 1.0.0、上の nixpkgs-unstable pin は 1.0.16、
     # 現 stable の nixos-26.05 でも 1.2.0 で未搭載。nixos-unstable だけが
-    # 1.6.0 を持つ。nixpkgs-unstable 自体を上げると niri が壊れる (下の
-    # 1Password overlay のコメント参照) ので、mise と同じく COSMIC だけ
-    # 別 input に隔離して影響範囲を COSMIC 一式に閉じ込める (全ホスト共通)。
+    # 1.6.0 を持つ。mise と同じく COSMIC だけ別 input に隔離して、
+    # 影響範囲を COSMIC 一式に閉じ込める (全ホスト共通)。
     nixpkgs-cosmic.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    niri = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     plasma-manager = {
@@ -68,7 +62,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, nixpkgs-cosmic, home-manager, niri, plasma-manager, nix-claude-code, herdr, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-mise, nixpkgs-cosmic, home-manager, plasma-manager, nix-claude-code, herdr, ... }@inputs:
     let
       mkHost = hostName: system:
         let
@@ -97,8 +91,7 @@
 
                 # GUI も nixpkgs は prebuilt tarball を落とすだけ (linux.nix は
                 # version をパス生成に使わない) なので、version/src の差し替えで
-                # 最新安定版に更新できる。nixpkgs-unstable 自体は上げない
-                # (上げると niri が libdisplay-info 削除で壊れるため)。
+                # 最新安定版に更新できる。
                 # 更新時: 下記の stable tarball URL の version を変え、
                 #   nix-prefetch-url <URL> | xargs nix hash convert --to sri --hash-algo sha256
                 # で hash を更新する。
@@ -123,7 +116,6 @@
           specialArgs = { inherit inputs pkgs-unstable pkgs-cosmic; };
           modules = [
             ./hosts/${hostName}
-            niri.nixosModules.niri
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;

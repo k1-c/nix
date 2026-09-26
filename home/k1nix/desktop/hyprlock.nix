@@ -1,5 +1,5 @@
 {
-  # Niri 配下でも hyprlock は単体動作する。NVIDIA で問題が出るようなら gtklock に切替予定。
+  # Hyprland 以外のセッションでも hyprlock は単体動作する。NVIDIA で問題が出るようなら gtklock に切替予定。
   programs.hyprlock = {
     enable = true;
     settings = {

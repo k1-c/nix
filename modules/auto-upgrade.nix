@@ -13,7 +13,7 @@
     # 毎日 bump して main に push し、ここは committed lock をそのまま適用する。
     # linear-tui も同様に update-linear-tui.yml が最新リリースへ bump する。
     # 他の input は flake.nix のコメント通り意図的に pin してあるので、まとめて
-    # 最新へ解決されると niri などが壊れる。更新は手元で個別に行う。
+    # 最新へ解決されると壊れうる。更新は手元で個別に行う。
     dates = "daily";
     randomizedDelaySec = "45min";
     allowReboot = false;

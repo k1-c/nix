@@ -19,7 +19,7 @@
     window-padding-y = 8
     # `server` = xdg-decoration-unstable-v1 で WM に装飾を任せる。
     #   Plasma: KWin が Breeze タイトルバーを SSD で描く (移動/リサイズ可)。
-    #   Hyprland/Niri: SSD を強く描かないので、結果的に従来の裸タイル見た目に近い。
+    #   Hyprland: SSD を強く描かないので、結果的に従来の裸タイル見た目に近い。
     # `false` (= none) は Plasma で「ドラッグ領域ゼロ窓」になるので NG。
     window-decoration = server
 
@@ -35,7 +35,6 @@
     # NOTE: blur の出どころはセッションごとに違う (実機で protocol / binary を確認済み)。
     #   COSMIC   : cosmic-comp 1.6.0 は ext_background_effect_manager_v1 のみ。
     #              client が blur region を要求する方式。
-    #   Niri     : niri-unstable 2026-05-15 は ext と org_kde_kwin_blur の両方を持つ。
     #   Plasma   : KWin 6.5.6 は org_kde_kwin_blur のみ (ext は 6.7 から)。ただし
     #              plasma.nix の forceblur が BlurNonMatching=true で全窓を強制 blur
     #              するので、client 側がプロトコルを喋らなくても見た目は保たれる。

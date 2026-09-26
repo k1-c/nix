@@ -4,7 +4,7 @@ let
   mod = "SUPER";
 in
 {
-  # Hyprland はリッチに振る方針。Niri は最小機能性重視、Hyprland は見た目・体験重視。
+  # Hyprland はリッチに振る方針。見た目・体験重視。
   # NVIDIA + Wayland 用の env (WLR_NO_HARDWARE_CURSORS / GBM_BACKEND 等) は
   # hosts/insomnia/nvidia.nix でシステム全体に設定済み。dwarf では NVIDIA 無しで素直に動く。
 
@@ -65,7 +65,7 @@ in
 
       input = {
         kb_layout = "us";
-        follow_mouse = 0;            # focus-follows-mouse 無効 (Niri と揃える)
+        follow_mouse = 0;            # focus-follows-mouse 無効
         accel_profile = "flat";
         touchpad = {
           natural_scroll = true;
@@ -232,9 +232,4 @@ in
       ];
     };
   };
-
-  # NOTE: home/k1nix/desktop/waybar.nix は Niri 想定の niri/workspaces, niri/window を
-  # 使っているため、Hyprland セッション下ではこれらのモジュールが空表示になる。
-  # 完全対応するには hyprland/workspaces, hyprland/window モジュールに分岐させる必要あり。
-  # Phase 2 で waybar を DE 中立な構成 (clock/network/battery のみ) に整理する予定。
 }

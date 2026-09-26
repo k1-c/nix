@@ -5,7 +5,7 @@
 
   # NVIDIA RTX 3070 (Ampere/GA104) のシングル GPU 運用前提。
   # モニタは NVIDIA HDMI に直結、iGPU には何も繋がっていないので PRIME 不要。
-  # Niri (Wayland) を安定して動かすため、proprietary kernel module ではなく
+  # Wayland を安定して動かすため、proprietary kernel module ではなく
   # open kernel module を使う (Turing+ で必須化されつつある)。
   hardware.nvidia = {
     open = lib.mkForce true;       # hosts/insomnia/hardware-configuration.nix の `open = false` を上書き
@@ -18,7 +18,7 @@
     # cfg.package に保ちつつ、extraModulePackages を `nvidia_x11.open` に切替える。
   };
 
-  # NVIDIA + Wayland (Niri) 安定化の定番カーネルパラメータ。
+  # NVIDIA + Wayland 安定化の定番カーネルパラメータ。
   # nvidia-drm.fbdev=1 は driver 545+ で導入された新フレームバッファ経路。
   # ブートロード時の黒画面リスクを減らす。
   boot.kernelParams = [
@@ -32,7 +32,7 @@
     LIBVA_DRIVER_NAME = "nvidia";
     NVD_BACKEND = "direct";
     # NVIDIA + Wayland でカーソル消失 / 起動直後ブラックアウトを防ぐ。
-    # Niri 初回ログインで真っ黒になった経験から有効化。
+    # (旧) Niri 初回ログインで真っ黒になった経験から有効化。
     WLR_NO_HARDWARE_CURSORS = "1";
   };
 

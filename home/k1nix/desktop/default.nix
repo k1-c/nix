@@ -1,6 +1,5 @@
 {
   imports = [
-    ./niri.nix
     ./hyprland.nix
     ./plasma.nix
     ./cosmic.nix

@@ -16,7 +16,7 @@
     # NOTE: hardware.nvidia.package を上書きしてはいけない (hosts/insomnia/nvidia.nix 参照)。
   };
 
-  # NVIDIA + Wayland (COSMIC / Niri) 安定化の定番カーネルパラメータ。
+  # NVIDIA + Wayland (COSMIC / Hyprland) 安定化の定番カーネルパラメータ。
   # nvidia-drm.modeset=1 は Ubuntu 時代の GRUB_CMDLINE にも入れていた。
   boot.kernelParams = [
     "nvidia-drm.modeset=1"

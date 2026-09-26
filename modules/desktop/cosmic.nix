@@ -71,7 +71,7 @@ in
 
   # NOTE: cosmic-greeter は入れない。ログインは引き続き SDDM で、
   # modules/desktop/common.nix の defaultSession = "cosmic" により既定で COSMIC が
-  # 選ばれる。Plasma / Niri / Hyprland はセッション選択で手動切り替え。
+  # 選ばれる。Plasma / Hyprland はセッション選択で手動切り替え。
   #
   # NOTE: Frosted Glass (COSMIC 1.3+) はコンパイル時フラグではなく実行時設定。
   # 有効化は COSMIC セッションにログインしてから

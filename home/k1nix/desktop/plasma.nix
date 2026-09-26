@@ -6,7 +6,7 @@ let
   animatedPath = "${config.home.homeDirectory}/.config/wallpaper/animated.mp4";
 in
 {
-  # Plasma 6 (Wayland) のユーザ側設定。Niri/Hyprland 用のリソースとは別 namespace で同居する。
+  # Plasma 6 (Wayland) のユーザ側設定。Hyprland 用のリソースとは別 namespace で同居する。
   # walker.service は graphical-session.target に紐付いていて Plasma セッションでも常駐するので、
   # ここではキーバインドだけ与える (KRunner より優先)。
 

@@ -6,23 +6,22 @@
   programs.waybar = {
     enable = true;
     # graphical-session.target 連動で起動する。
-    # Niri 側の spawn-at-startup は意図的に外しているので二重起動しない。
-    # systemd 経由なら niri IPC が確実に上がってから waybar が起動して
-    # niri/workspaces モジュールが繋がる。
+    # systemd 経由なら compositor の IPC が確実に上がってから waybar が起動して
+    # hyprland/workspaces モジュールが繋がる。
     systemd.enable = true;
     settings.mainBar = {
       layer = "top";
       position = "top";
       height = 28;
       spacing = 6;
-      modules-left = [ "niri/workspaces" "niri/window" ];
+      modules-left = [ "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "battery" "tray" ];
 
-      "niri/workspaces" = {
-        format = "{index}";
+      "hyprland/workspaces" = {
+        format = "{id}";
       };
-      "niri/window" = {
+      "hyprland/window" = {
         format = "{title}";
         max-length = 60;
       };

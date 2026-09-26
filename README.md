@@ -15,7 +15,7 @@ k1-c's NixOS configuration (flake). Manages multiple machines from a single flak
 │   ├── dwarf/             #   sub desktop (Intel iGPU)
 │   └── mind/              #   sub desktop (Intel iGPU + DisplayLink)
 ├── modules/               # NixOS modules (shared across hosts)
-│   └── desktop/           #   SDDM + COSMIC (default) / Plasma / Niri / Hyprland
+│   └── desktop/           #   SDDM + COSMIC (default) / Plasma / Hyprland
 └── home/k1nix/            # home-manager (user "k1nix")
     ├── claude-code.nix    #   Claude Code + statusLine (repo / branch / Linear issue)
     └── desktop/           #   waybar / fuzzel / hyprlock etc.
@@ -40,10 +40,9 @@ Pick at login via SDDM:
 
 - **COSMIC** (Wayland) — default on every host. Uses COSMIC 1.6 from `nixos-unstable` (see `modules/desktop/cosmic.nix`) for Frosted Glass. Untested on the NVIDIA hosts as of 2026-09; if it fails to start, pick Plasma from SDDM.
 - **Plasma** (Wayland) — Liquid Glass-ish look (KWin Blur + Background Contrast + `kde-rounded-corners`, transparent panel). Walker bound to `Meta+Return` / `Meta+D`. Animated wallpaper via `plasma-smart-video-wallpaper-reborn` (drop a file at `~/.config/wallpaper/animated.mp4`).
-- **Niri** (Wayland, scrollable tiling)
 - **Hyprland** (Wayland, dynamic tiling)
 
-Per-DE home-manager configs live in `home/k1nix/desktop/{plasma,niri,hyprland}.nix`. KDE side is configured declaratively via `plasma-manager`. waybar and friends run as systemd user units bound to `graphical-session.target`.
+Per-DE home-manager configs live in `home/k1nix/desktop/{plasma,hyprland}.nix`. KDE side is configured declaratively via `plasma-manager`. waybar and friends run as systemd user units bound to `graphical-session.target`.
 
 > SDDM greeter itself still runs on X11 (`wayland.enable = false`) to dodge the NVIDIA + open-module + `kwin_wayland` atomic-modeset bug — only the Plasma *session* is Wayland.
 
@@ -235,7 +234,7 @@ What it catches:
 - Typos in import paths
 - `flake.lock` consistency
 
-What it does **not** catch: actual builds (proprietary NVIDIA, `niri-unstable`, and friends are not fetched in CI). Run `nixos-rebuild dry-build` locally, or extend the workflow with a build job if needed.
+What it does **not** catch: actual builds (proprietary NVIDIA and friends are not fetched in CI). Run `nixos-rebuild dry-build` locally, or extend the workflow with a build job if needed.
 
 ---
 
@@ -244,7 +243,6 @@ What it does **not** catch: actual builds (proprietary NVIDIA, `niri-unstable`, 
 | input              | source                                     | purpose                                     |
 | ------------------ | ------------------------------------------ | ------------------------------------------- |
 | `nixpkgs`          | `NixOS/nixpkgs/nixos-25.11`                | main package set                            |
-| `nixpkgs-unstable` | `NixOS/nixpkgs/nixos-unstable`             | `niri-flake` follows / a few newer packages |
+| `nixpkgs-unstable` | `NixOS/nixpkgs/nixos-unstable`             | a few newer packages (gh, codex)            |
 | `home-manager`     | `nix-community/home-manager/release-25.11` | user-level configuration                    |
-| `niri`             | `sodiboo/niri-flake`                       | `niri-unstable` + NixOS module              |
 | `plasma-manager`   | `nix-community/plasma-manager`             | declarative KDE Plasma 6 home-manager module |

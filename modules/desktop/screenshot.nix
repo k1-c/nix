@@ -2,7 +2,7 @@
 
 let
   # Spectacle 相当 (領域選択 → 注釈 → クリップボード/保存) を Wayland 汎用の
-  # grim + slurp + satty で組んだラッパー。COSMIC / Niri / Hyprland のどのセッションでも
+  # grim + slurp + satty で組んだラッパー。COSMIC / Hyprland のどのセッションでも
   # 同じコマンドで動く (compositor 固有の protocol ではなく wlr-screencopy を使うため)。
   #
   # COSMIC 標準の Print キー (cosmic-screenshot → xdg-desktop-portal-cosmic) は
