@@ -48,6 +48,12 @@
     go
     rustup
     dotnet-sdk
+
+    # ゲーム開発 (Summoner Life, github.com/k1-c/game-lab)。
+    # daiv 以外では作業しないのでホスト側に置く。game-lab の flake.nix にも
+    # 同じツールの devShell があるので、他ホストで触るなら nix develop で足りる。
+    godot_4           # 4.5.x。エディタは `godot4`
+    blender           # AI 生成モデル (GLB) のスケール・原点・ポリゴン数の確認用
   ];
 
   # Ubuntu 時代にターミナルで使っていた Nerd Font。
