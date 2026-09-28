@@ -84,6 +84,8 @@
     obsidian
     ulauncher
     video-trimmer
+    sticky           # 付箋アプリ (Linux Mint 製)。色分け・チェックリスト・トレイ常駐
+                     # Wayland ではウィンドウ位置を復元できない (X11 の Plasma セッションでは可)
 
     # GUI helpers
     kdePackages.kate
