@@ -86,6 +86,8 @@
     video-trimmer
     sticky           # 付箋アプリ (Linux Mint 製)。色分け・チェックリスト・トレイ常駐
                      # Wayland ではウィンドウ位置を復元できない (X11 の Plasma セッションでは可)
+    sticky-notes     # 付箋アプリ (vixalien 製)。GTK4 / libadwaita でネイティブ Wayland。
+                     # 実行ファイルは com.vixalien.sticky なので上の sticky とは衝突しない
 
     # GUI helpers
     kdePackages.kate
