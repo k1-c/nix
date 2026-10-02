@@ -25,6 +25,11 @@
 
     # ─── フォント ────────────────────────────────────────────
     font-family = JetBrainsMono Nerd Font
+    # CJK を primary 側に明示する。fontconfig 任せのフォールバックだと、
+    # JetBrainsMono に無い記号 (⏵ ✱ 等。herdr / Claude Code が多用) で先に
+    # Unifont が読み込まれ、以降の漢字まで Unifont (中国語字形のビットマップ) で
+    # 描かれてしまう。ghostty は読み込み済みフォールバックを再利用するため。
+    font-family = Noto Sans Mono CJK JP
     font-size = 11
 
     # ─── 体験 ────────────────────────────────────────────────
