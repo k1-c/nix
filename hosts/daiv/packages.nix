@@ -54,6 +54,9 @@
     # 同じツールの devShell があるので、他ホストで触るなら nix develop で足りる。
     godot_4           # 4.5.x。エディタは `godot4`
     blender           # AI 生成モデル (GLB) のスケール・原点・ポリゴン数の確認用
+    # キャラクターアニメーション用。nixpkgs 未収録なので公式 tarball を自前でパッケージ化。
+    # 更新手順は cascadeur.nix の冒頭を参照。
+    (callPackage ./cascadeur.nix { })
   ];
 
   # Ubuntu 時代にターミナルで使っていた Nerd Font。
