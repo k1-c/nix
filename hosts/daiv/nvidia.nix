@@ -32,6 +32,25 @@
     WLR_NO_HARDWARE_CURSORS = "1";
   };
 
+  # cosmic-panel が NVIDIA の explicit sync 経路 (libnvidia-egl-wayland) で
+  # sync_file fd をリークし、soft limit 1024 に達して "Too many open files" で落ちる
+  # (パネル・時計が消える)。NVIDIA 側の既知バグ (internal bug 5556719、580.142 で未修正)。
+  # 全体に効かせるとゲーム / ブラウザも巻き込むので、パネル (と子プロセスのアプレット) だけ
+  # explicit sync を切る。symlinkJoin + wrapProgram なので Rust の再ビルドは発生しない。
+  # mkAfter は modules/desktop/cosmic.nix の 1.6.0 差し替え overlay より後に当てるため。
+  nixpkgs.overlays = lib.mkAfter [
+    (final: prev: {
+      cosmic-panel = final.symlinkJoin {
+        name = "cosmic-panel-${prev.cosmic-panel.version}";
+        paths = [ prev.cosmic-panel ];
+        nativeBuildInputs = [ final.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/cosmic-panel --set __NV_DISABLE_EXPLICIT_SYNC 1
+        '';
+      };
+    })
+  ];
+
   # VA-API 経由のハードウェアデコード (ブラウザ等で利用)。
   hardware.graphics.extraPackages = with pkgs; [
     nvidia-vaapi-driver
