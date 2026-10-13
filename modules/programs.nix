@@ -38,6 +38,8 @@
       libdrm
       libxkbcommon
       mesa
+      # nixos-25.11 で mesa から分離された。Playwright の Chromium が要求する。
+      libgbm
       expat
       libGL
       pango
