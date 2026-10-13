@@ -96,6 +96,10 @@
     gh
     # nixos-25.11 の codex が古いため unstable を採用 (最新版を取得)
     codex
+    # ChatGPT デスクトップアプリ (公式 .deb の再パッケージ, unfree)。Linux 版は
+    # 2026-08 にプレビュー公開され、nixpkgs でも unstable のみ x86_64-linux 対応。
+    # 同梱 codex は上の pkgs-unstable の codex に差し替えられる。
+    chatgpt
   ]) ++ [
     # herdr (AI エージェント・マルチプレクサ)。nixpkgs 未収録のため公式 flake から取得。
     inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
