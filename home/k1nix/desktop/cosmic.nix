@@ -4,21 +4,28 @@ let
   # cosmic-bg の Source::Path はディレクトリを渡すと、その中の画像を
   # rotation_frequency 秒ごとに巡回するスライドショーになる (1 枚だけ固定したい場合は
   # ファイルまでのフルパスを書く)。
-  # cosmic-wallpapers 1.6.0 が入れているのは NASA/ESA の宇宙写真 7 枚
+  # 使うのは cosmic-wallpapers の NASA/ESA の宇宙写真 7 枚 (jpg)
   # (orion_nebula / tarantula_nebula / webb-inspired-wallpaper-system76 など)。
   # どれも暗色寄りなので、Dark テーマ + 紫アクセント (#E79CFE) の Frosted Glass
   # パネルが乗っても文字が沈まない。
+  # 1.10.0 で同じディレクトリに COSMIC-Pattern-{Dark,Light} / COSMIC-logo-{Dark,White}
+  # (png) が増え、Light 版が巡回に混ざるので、jpg だけの symlink ディレクトリを渡す。
+  # cosmic-bg は WalkDir の follow_links(true) で辿るので symlink で問題ない。
   #
   # NOTE: pkgs は home-manager.useGlobalPkgs = true 経由で system 側と同一なので、
-  # mind では modules/desktop/cosmic.nix の overlay が効いて 1.6.0 が来る。
+  # modules/desktop/cosmic.nix の overlay が効いて 1.10.0 が来る。
   # store パスを直書きしているため GC で消えることはない (世代が参照を持つ)。
-  wallpaperDir = "${pkgs.cosmic-wallpapers}/share/backgrounds/cosmic";
+  wallpaperDir = pkgs.runCommand "cosmic-wallpapers-photos" { } ''
+    mkdir -p $out
+    ln -s ${pkgs.cosmic-wallpapers}/share/backgrounds/cosmic/*.jpg $out/
+  '';
 
   # cosmic-bg-config の Entry (ron)。フィールド名と enum の綴りは cosmic-bg 1.6.0 の
   # バイナリ内シンボルに合わせてある (Source: Path/Color, ScalingMode: Fit/Stretch/Zoom,
   # FilterMethod: Nearest/Linear/Lanczos, SamplingMethod: Alphanumeric/Random)。
-  #   filter_by_theme  : ファイル名の明暗バリアントで絞り込む機能。上記 7 枚はその命名
-  #                      規則を持たないので false のままにする。
+  # 1.10.0 でも同じ綴りであることを確認済み。
+  #   filter_by_theme  : 明暗テーマで絞り込むための設定。1.10.0 時点では
+  #                      cosmic-bg 側が未実装 (src/wallpaper.rs の TODO) なので false のまま。
   #   sampling_method  : Random = 巡回順をシャッフル。ファイル名順にしたいなら Alphanumeric。
   #   scaling_mode     : Zoom = アスペクト比を保ったまま画面いっぱいに切り取る。
   #   filter_method    : Lanczos = 拡大時の品質優先。

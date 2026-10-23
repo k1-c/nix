@@ -12,7 +12,7 @@
     # COSMIC 専用。Frosted Glass は COSMIC 1.3 で入った機能だが、nixpkgs
     # nixos-25.11 は cosmic 1.0.0、上の nixpkgs-unstable pin は 1.0.16、
     # 現 stable の nixos-26.05 でも 1.2.0 で未搭載。nixos-unstable だけが
-    # 1.6.0 を持つ。mise と同じく COSMIC だけ別 input に隔離して、
+    # 1.10.0 を持つ。mise と同じく COSMIC だけ別 input に隔離して、
     # 影響範囲を COSMIC 一式に閉じ込める (全ホスト共通)。
     nixpkgs-cosmic.url = "github:NixOS/nixpkgs/nixos-unstable";
 

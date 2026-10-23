@@ -3,7 +3,7 @@
 let
   # COSMIC は cosmic-comp / cosmic-panel / cosmic-applets などが private な
   # Wayland protocol と設定スキーマで会話するため、世代を混ぜると起動しない。
-  # 「一式まとめて unstable 側 (1.6.0) に揃える」のが前提で、下のリストは
+  # 「一式まとめて unstable 側 (1.10.0) に揃える」のが前提で、下のリストは
   # nixpkgs の cosmic module が参照するパッケージ名を並べたもの。
   # glib / playerctl / pulseaudio / networkmanagerapplet 等の汎用パッケージは
   # 25.11 のまま使う (差し替えると system 全体に波及して closure が膨らむ)。
@@ -43,14 +43,19 @@ let
 in
 {
   # module 本体は nixpkgs 25.11 側 (services.desktopManager.cosmic) をそのまま使い、
-  # パッケージだけ unstable の 1.6.0 に差し替える方式。
+  # パッケージだけ unstable の 1.10.0 に差し替える方式。
   # unstable 側の module を disabledModules + imports で持ち込む手も試したが、
   # あちらは security.polkit.enablePkexecWrapper (25.11 に存在しない option) を
-  # 定義するため評価できない。25.11 module ↔ 1.6.0 パッケージの差分は
+  # 定義するため評価できない。25.11 module ↔ 1.10.0 パッケージの差分は
   #   - cosmic-applibrary → cosmic-app-library のリネーム (下の overlay で吸収)
-  #   - cosmic-monitor / cosmic-reader / cosmic-sound-theme の新設
+  #   - cosmic-monitor / cosmic-reader / cosmic-sound-theme / cosmic-osk /
+  #     cosmic-viewer の新設
   #     (25.11 module は知らないので environment.systemPackages に手で足す)
+  #   - cosmic-settings-daemon が geoclue2 agent を同梱しなくなった
+  #     (下の services.geoclue2 で吸収)
   # だけなので、こちらの向きの方が壊れる箇所が少ない。
+  # (unstable module が新たに既定で有効にする system76-scheduler / system76-power /
+  # switcherooControl は COSMIC の動作に必須ではないので追従していない)
   nixpkgs.overlays = [
     (final: prev:
       lib.genAttrs cosmicPkgNames (name: pkgs-cosmic.${name})
@@ -62,12 +67,22 @@ in
 
   services.desktopManager.cosmic.enable = true;
 
-  # 1.6.0 で追加され、25.11 の module がまだ知らないもの。
+  # 1.0.0 より後で追加され、25.11 の module がまだ知らないもの。
+  # cosmic-osk (スクリーンキーボード) は unstable module では core 扱い。
   environment.systemPackages = [
     pkgs-cosmic.cosmic-monitor
+    pkgs-cosmic.cosmic-osk
     pkgs-cosmic.cosmic-reader
     pkgs-cosmic.cosmic-sound-theme
+    pkgs-cosmic.cosmic-viewer
   ];
+
+  # 25.11 module は「cosmic-settings-daemon 同梱の geoclue2 agent と衝突する」として
+  # demo agent を止めるが、新しい cosmic-settings-daemon はもう agent を同梱しない。
+  # 止めたままだと位置情報を仲介する agent が居なくなるので戻す
+  # (unstable module も同じ理由で geoclue2 の既定値に戻している)。
+  # whitelistedAgents = [ "geoclue-demo-agent" ] は 25.11 module のままで噛み合う。
+  services.geoclue2.enableDemoAgent = lib.mkForce true;
 
   # NOTE: cosmic-greeter は入れない。ログインは引き続き SDDM で、
   # modules/desktop/common.nix の defaultSession = "cosmic" により既定で COSMIC が

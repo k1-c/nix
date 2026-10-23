@@ -38,7 +38,7 @@ Both hosts share a single user account `k1nix`. Initial password is `password` (
 
 Pick at login via SDDM:
 
-- **COSMIC** (Wayland) — default on every host. Uses COSMIC 1.6 from `nixos-unstable` (see `modules/desktop/cosmic.nix`) for Frosted Glass. Untested on the NVIDIA hosts as of 2026-09; if it fails to start, pick Plasma from SDDM.
+- **COSMIC** (Wayland) — default on every host. Uses COSMIC 1.10 from `nixos-unstable` (see `modules/desktop/cosmic.nix`) for Frosted Glass. Untested on the NVIDIA hosts as of 2026-09; if it fails to start, pick Plasma from SDDM.
 - **Plasma** (Wayland) — Liquid Glass-ish look (KWin Blur + Background Contrast + `kde-rounded-corners`, transparent panel). Walker bound to `Meta+Return` / `Meta+D`. Animated wallpaper via `plasma-smart-video-wallpaper-reborn` (drop a file at `~/.config/wallpaper/animated.mp4`).
 - **Hyprland** (Wayland, dynamic tiling)
 

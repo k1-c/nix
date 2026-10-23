@@ -37,7 +37,7 @@
   # (パネル・時計が消える)。NVIDIA 側の既知バグ (internal bug 5556719、580.142 で未修正)。
   # 全体に効かせるとゲーム / ブラウザも巻き込むので、パネル (と子プロセスのアプレット) だけ
   # explicit sync を切る。symlinkJoin + wrapProgram なので Rust の再ビルドは発生しない。
-  # mkAfter は modules/desktop/cosmic.nix の 1.6.0 差し替え overlay より後に当てるため。
+  # mkAfter は modules/desktop/cosmic.nix の unstable 差し替え overlay より後に当てるため。
   nixpkgs.overlays = lib.mkAfter [
     (final: prev: {
       cosmic-panel = final.symlinkJoin {
