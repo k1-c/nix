@@ -53,11 +53,11 @@ Blocks every site in Google Chrome except an allowlist, via a root-owned Chrome 
 ```sh
 focus on [90m]       # start (no password); extends if already on
 focus off            # turns off 10 minutes later (sudo); `focus cancel` to undo
-focus allow <URL>    # allow a host until this focus session ends (sudo)
+focus allow <URL>    # add a host to this machine's allowlist (sudo)
 focus / focus list   # status / effective allowlist
 ```
 
-Permanent entries live in `modules/focus-mode/allowlist.txt`; commit and push before rebuilding, or the daily auto-upgrade reverts it.
+The allowlist is a minimal template in `modules/focus-mode/allowlist.txt` (browser internals, localhost, search, Google sign-in) plus a per-host file `/etc/focus-mode/allowlist.txt` that is not in git. Keep anything work-related in the per-host file — this repo is public. Edit it with `focus allow` or `sudoedit`.
 
 ---
 

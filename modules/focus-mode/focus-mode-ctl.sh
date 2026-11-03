@@ -1,16 +1,18 @@
 # focus-mode-ctl: Focus モードの状態管理と Chrome ポリシーの書き出し。
-# 冒頭の変数 (STATE_DIR POLICY_FILE BASE_ALLOWLIST DEFAULT_DURATION
-# OFF_DELAY_SEC REQUIRE_ROOT) は package.nix が前置する。
+# 冒頭の変数 (STATE_DIR POLICY_FILE BASE_ALLOWLIST LOCAL_ALLOWLIST
+# DEFAULT_DURATION OFF_DELAY_SEC REQUIRE_ROOT) は package.nix が前置する。
+#
+# 許可リスト = BASE_ALLOWLIST  リポジトリのテンプレート (JSON 配列)
+#            + LOCAL_ALLOWLIST ホストごと・git 管理外 (focus allow / sudoedit で編集)
 #
 # 状態 ($STATE_DIR):
 #   until   Focus の終了時刻 (epoch 秒)。これがあって現在時刻より後なら ON
 #   off-at  解除予約の時刻 (epoch 秒)。focus off で作り、focus cancel で消す
-#   extra   この Focus 中だけの追加許可 (1 行 1 ホスト)。Focus 終了時に消す
-# ポリシーファイル ($POLICY_FILE) は状態から導出する。sync が両者を突き合わせる。
+# ポリシーファイル ($POLICY_FILE) は状態と許可リストから導出し、sync が突き合わせる。
+# ローカルの許可リストを手で直しても、timer の sync で 30 秒以内に反映される。
 
 until_file="$STATE_DIR/until"
 off_at_file="$STATE_DIR/off-at"
-extra_file="$STATE_DIR/extra"
 
 die() {
   echo "focus: $*" >&2
@@ -24,11 +26,12 @@ usage() {
   on [時間]                Focus を開始 (既定 $DEFAULT_DURATION)。実行中なら終了時刻を延ばす。パスワード不要
   off                      $((OFF_DELAY_SEC / 60)) 分後に解除する予約をする (sudo)
   cancel                   解除予約を取り消す。パスワード不要
-  allow <URL|ドメイン>...  この Focus 中だけ許可を足す (sudo)
-  list                     いま効いている許可リストを表示
+  allow <URL|ドメイン>...  このホストの許可リストに足す (sudo)
+  list                     許可リストを表示
 
 時間の書式: 90 (分) / 90m / 2h / 1h30m
-恒久的な許可リスト: nix リポジトリの modules/focus-mode/allowlist.txt
+許可リスト: テンプレート (nix リポジトリの modules/focus-mode/allowlist.txt)
+          + ローカル ($LOCAL_ALLOWLIST、git 管理外。直すなら sudoedit)
 EOF
 }
 
@@ -53,6 +56,25 @@ is_active() {
   [[ -n $end_at ]] || return 1
   ((now < end_at)) || return 1
   [[ -z $off_at ]] || ((now < off_at))
+}
+
+# ローカル許可リストのエントリ (コメント・空行を除く)。ファイルが無ければ何も出さない。
+local_entries() {
+  if [[ -f $LOCAL_ALLOWLIST ]]; then
+    sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$LOCAL_ALLOWLIST"
+  fi
+}
+
+ensure_local_file() {
+  if [[ -f $LOCAL_ALLOWLIST ]]; then return; fi
+  mkdir -p "$(dirname "$LOCAL_ALLOWLIST")"
+  cat >"$LOCAL_ALLOWLIST" <<EOF
+# Focus モードのローカル許可リスト (このホストだけ・git 管理外)。
+# リポジトリの modules/focus-mode/allowlist.txt (テンプレート) に足して使われる。
+# 書式も同じ: 1 行 1 エントリ、# 以降はコメント。
+# 追加: focus allow <URL>   編集: sudoedit $LOCAL_ALLOWLIST
+EOF
+  chmod 0644 "$LOCAL_ALLOWLIST"
 }
 
 # epoch 秒 → "15:30" (今日以外は "11/04 15:30")
@@ -101,18 +123,21 @@ normalize_host() {
 }
 
 write_policy() {
-  local dir tmp extra=/dev/null
+  local dir tmp count
   dir=$(dirname "$POLICY_FILE")
   # Chrome は managed/ 内のファイルをすべて読むので、書きかけのファイルは
   # 1 つ上に置いて rename で差し替える。
   tmp="$(dirname "$dir")/.focus-mode.json.tmp"
   mkdir -p "$dir"
-  if [[ -f $extra_file ]]; then extra=$extra_file; fi
-  jq -n --slurpfile base "$BASE_ALLOWLIST" --rawfile extra "$extra" '{
+  local_entries | jq -Rs --slurpfile base "$BASE_ALLOWLIST" '{
     URLBlocklist: ["*"],
-    URLAllowlist: ($base[0] + ($extra | split("\n") | map(select(. != ""))) | unique)
+    URLAllowlist: ($base[0] + (split("\n") | map(select(. != ""))) | unique)
   }' >"$tmp"
   chmod 0644 "$tmp"
+  count=$(jq '.URLAllowlist | length' "$tmp")
+  if ((count > 1000)); then
+    echo "focus: 警告: 許可リストが $count 件あります。Chrome は 1000 件を超えた分を無視します" >&2
+  fi
   # timer から 30 秒ごとに呼ばれるので、変化が無ければ触らない
   # (Chrome にポリシーの再読み込みを無駄に起こさせない)。
   if [[ -f $POLICY_FILE ]] && cmp -s "$tmp" "$POLICY_FILE"; then
@@ -125,7 +150,7 @@ write_policy() {
 deactivate() {
   local was_on=0
   if [[ -f $POLICY_FILE ]]; then was_on=1; fi
-  rm -f "$POLICY_FILE" "$until_file" "$off_at_file" "$extra_file"
+  rm -f "$POLICY_FILE" "$until_file" "$off_at_file"
   if ((was_on)); then echo "Focus モードを終了しました"; fi
 }
 
@@ -135,32 +160,29 @@ cmd_sync() {
 }
 
 cmd_status() {
-  if ! is_active; then
+  if is_active; then
+    local now end_at off_at
+    now=$(date +%s)
+    end_at=$(read_epoch "$until_file")
+    off_at=$(read_epoch "$off_at_file")
+    echo "Focus: ON  ($(fmt_time "$end_at") まで / 残り $(fmt_duration $((end_at - now))))"
+    if [[ -n $off_at ]]; then
+      echo "解除予約: $(fmt_time "$off_at") (取り消し: focus cancel)"
+    fi
+  else
     echo "Focus: OFF"
-    return
   fi
-  local now end_at off_at n
-  now=$(date +%s)
-  end_at=$(read_epoch "$until_file")
-  off_at=$(read_epoch "$off_at_file")
-  echo "Focus: ON  ($(fmt_time "$end_at") まで / 残り $(fmt_duration $((end_at - now))))"
-  if [[ -n $off_at ]]; then
-    echo "解除予約: $(fmt_time "$off_at") (取り消し: focus cancel)"
-  fi
-  if [[ -s $extra_file ]]; then
-    n=$(grep -c . "$extra_file" || true)
-    echo "一時追加: $n 件 (focus list で表示)"
+  if [[ ! -f $LOCAL_ALLOWLIST ]]; then
+    echo "注意: ローカル許可リスト ($LOCAL_ALLOWLIST) がありません。テンプレートの最小限しか許可されません"
   fi
 }
 
 cmd_list() {
-  echo "# 恒久 (allowlist.txt)"
+  echo "# テンプレート (リポジトリの modules/focus-mode/allowlist.txt)"
   jq -r '.[]' "$BASE_ALLOWLIST"
-  if is_active && [[ -s $extra_file ]]; then
-    echo
-    echo "# 一時追加 (この Focus 中のみ)"
-    cat "$extra_file"
-  fi
+  echo
+  echo "# ローカル ($LOCAL_ALLOWLIST)"
+  local_entries
 }
 
 cmd_on() {
@@ -174,8 +196,6 @@ cmd_on() {
     # 延長のみ。短くはしない (focus on 1m で抜けられないように)
     cur=$(read_epoch "$until_file")
     if ((cur > end_at)); then end_at=$cur; fi
-  else
-    rm -f "$extra_file" # 前回の一時追加を持ち越さない
   fi
   mkdir -p "$STATE_DIR"
   echo "$end_at" >"$until_file"
@@ -219,19 +239,25 @@ cmd_cancel() {
 cmd_allow() {
   require_root
   (($# >= 1)) || die "使い方: focus allow <URL またはドメイン>..."
-  is_active || die "Focus モードは有効ではありません (恒久的に足すなら allowlist.txt を編集してください)"
-  local arg host
+  local arg host entries
+  entries=$(local_entries)
   for arg in "$@"; do
     host=$(normalize_host "$arg")
     if jq -e --arg h "$host" 'any(. == $h)' "$BASE_ALLOWLIST" >/dev/null ||
-      grep -qxF "$host" "$extra_file" 2>/dev/null; then
+      grep -qxF "$host" <<<"$entries"; then
       echo "許可済み: $host"
-    else
-      echo "$host" >>"$extra_file"
-      echo "追加: $host"
+      continue
     fi
+    ensure_local_file
+    # 手で編集されて末尾に改行が無いと、追記した行がつながってしまう
+    if [[ -s $LOCAL_ALLOWLIST && -n $(tail -c1 "$LOCAL_ALLOWLIST") ]]; then
+      echo >>"$LOCAL_ALLOWLIST"
+    fi
+    echo "$host" >>"$LOCAL_ALLOWLIST"
+    entries+=$'\n'"$host"
+    echo "追加: $host"
   done
-  write_policy
+  if is_active; then write_policy; fi
 }
 
 cmd=${1:-status}

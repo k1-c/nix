@@ -1,61 +1,32 @@
-# Focus モードの恒久許可リスト (全ホスト共通)。
+# Focus モードの許可リスト: 全ホスト共通のテンプレート部分。
 #
-# 1 行 1 エントリ。# 以降はコメント。書式は Chrome の URLAllowlist と同じ:
+# このリポジトリは公開されているので、業務に関わるもの (仕事で使うサービス・
+# 顧客・社内のホスト名など) はここに書かない。それらはホストごとのローカル
+# ファイル /etc/focus-mode/allowlist.txt (git 管理外) に書く:
+#   focus allow <URL>                        追加
+#   sudoedit /etc/focus-mode/allowlist.txt   編集・削除 (30 秒以内に反映)
+#
+# 書式 (ローカルファイルも同じ): 1 行 1 エントリ。# 以降はコメント。
 #   example.com        example.com とそのサブドメインすべて
 #   .example.com       example.com だけ (サブドメインは含まない)
 #   example.com/docs   そのパス以下だけ
 #   https://chromeenterprise.google/policies/url-patterns/
-#
-# 編集したら commit → push → rebuild。push しないと次の autoUpgrade で元に戻る。
-# Focus 中に今だけ足すなら `focus allow <URL>` (その Focus が終わると消える)。
 #
 # 許可されるかどうかはページ遷移 (タブ / iframe) 単位で判定される。ページが
 # 裏で読む CDN・フォント・API などは書かなくてよい。
 
 # --- ブラウザ内部ページ・ローカル ---
 chrome://*
-chrome-untrusted://*      # 新しいタブページの部品
-chrome-extension://*      # 1Password などの拡張のページ
+chrome-untrusted://*          # 新しいタブページの部品
+chrome-extension://*          # 1Password などの拡張のページ
 file://*
-localhost
+localhost                     # *.localhost も含む
 127.0.0.1
 
-# --- 検索・ログイン ---
+# --- 検索・Google アカウント ---
 www.google.com
+www.google.co.jp
 accounts.google.com
-.accounts.youtube.com     # Google ログインがリダイレクトで経由する。youtube.com 本体は許可しない
-
-# --- 仕事 ---
-integritis.io
-linear.app
-notion.so
-notion.com
-slack.com
-claude.ai
-claude.com
-anthropic.com
-docs.google.com
-drive.google.com
-calendar.google.com
-mail.google.com
-meet.google.com
-1password.com
-
-# --- 開発 ---
-github.com
-githubusercontent.com
-vercel.com
-cloudflare.com
-npmjs.com
-developer.mozilla.org
-stackoverflow.com
-nixos.org
-nix.dev
-nix-community.github.io
-rust-lang.org
-docs.rs
-crates.io
-typescriptlang.org
-nodejs.org
-react.dev
-nextjs.org
+accounts.google.co.jp
+myaccount.google.com
+.accounts.youtube.com         # Google ログインがリダイレクトで経由する。youtube.com 本体は許可しない

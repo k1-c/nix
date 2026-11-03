@@ -8,9 +8,11 @@
   coreutils,
   diffutils,
   gnugrep,
+  gnused,
   jq,
 
   allowlist,
+  localAllowlist,
   stateDir,
   policyFile,
   defaultDuration,
@@ -30,12 +32,14 @@ let
       coreutils
       diffutils
       gnugrep
+      gnused
       jq
     ];
     text = ''
       STATE_DIR=${lib.escapeShellArg stateDir}
       POLICY_FILE=${lib.escapeShellArg policyFile}
       BASE_ALLOWLIST=${baseAllowlist}
+      LOCAL_ALLOWLIST=${lib.escapeShellArg localAllowlist}
       DEFAULT_DURATION=${lib.escapeShellArg defaultDuration}
       OFF_DELAY_SEC=${toString offDelaySec}
       REQUIRE_ROOT=${if requireRoot then "1" else "0"}

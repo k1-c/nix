@@ -11,12 +11,20 @@
 #     状態は /var/lib/focus-mode/ に置き、再起動しても Focus は続く
 #     (再起動で抜けられないように)。
 #   - focus-mode-sync.timer が 30 秒ごとに状態とポリシーを突き合わせる
-#     (終了時刻・解除予約の処理と、rebuild 後の許可リストの反映)。
+#     (終了時刻・解除予約の処理と、許可リストの変更の反映)。
+#
+# 許可リスト = テンプレート + ローカル
+#   - テンプレート: ./allowlist.txt。このリポジトリは公開なので、ブラウザが動くのに
+#     要る最小限 (内部ページ・localhost・検索・Google ログイン) だけを置く。
+#   - ローカル: /etc/focus-mode/allowlist.txt。仕事で使うサービスなど業務に関わる
+#     ものはすべてこちら。ホストごと・git 管理外・root 所有。
+#     focus allow で追記し、直すときは sudoedit。
 #
 # 摩擦の設計 (wheel 持ちの自分のマシンなので、sudo で何でも外せる前提)
 #   - focus on / cancel: パスワード不要 (縛りを強める方向なので)
 #   - focus off: sudo + OFF_DELAY 後に解除 (衝動が過ぎるのを待つ)
 #   - focus allow: sudo のみ (正当な用途ですぐ足したい場面が多いので待ちなし)
+#     ローカル許可リストをユーザーが書けないのも、sudo なしで足せないようにするため。
 #
 # 対象は Google Chrome のみ。chromium (drawio の headless export に使う) や
 # terminal-browser などの他ブラウザは対象外。
@@ -25,6 +33,7 @@
 let
   stateDir = "/var/lib/focus-mode";
   policyFile = "/etc/opt/chrome/policies/managed/focus-mode.json";
+  localAllowlist = "/etc/focus-mode/allowlist.txt";
 
   # allowlist.txt: 1 行 1 エントリ。# 以降はコメント。
   allowlist = lib.pipe ./allowlist.txt [
@@ -36,7 +45,12 @@ let
 
   inherit
     (pkgs.callPackage ./package.nix {
-      inherit allowlist stateDir policyFile;
+      inherit
+        allowlist
+        localAllowlist
+        stateDir
+        policyFile
+        ;
       defaultDuration = "90m";
       offDelaySec = 10 * 60;
     })
@@ -45,15 +59,6 @@ let
     ;
 in
 {
-  assertions = [
-    {
-      # URLAllowlist は 1000 件を超えた分が黙って無視される。
-      # focus allow の一時追加ぶんを残しておく。
-      assertion = lib.length allowlist <= 900;
-      message = "modules/focus-mode/allowlist.txt が多すぎます (${toString (lib.length allowlist)} 件、上限 900)";
-    }
-  ];
-
   environment.systemPackages = [ focus ];
 
   # 既定の wheel ルール (mkOrder 600) より後ろに並ぶので、こちらが優先される。
@@ -74,7 +79,10 @@ in
     }
   ];
 
-  systemd.tmpfiles.rules = [ "d ${stateDir} 0755 root root -" ];
+  systemd.tmpfiles.rules = [
+    "d ${stateDir} 0755 root root -"
+    "d ${dirOf localAllowlist} 0755 root root -"
+  ];
 
   systemd.services.focus-mode-sync = {
     description = "Reconcile Focus mode state with the Chrome policy";
