@@ -1,8 +1,6 @@
 { pkgs, pkgs-unstable, ... }:
 
 {
-  programs.firefox.enable = true;
-
   # 1Password デスクトップアプリ。ブラウザ統合の setuid ラッパー・polkit ポリシー・
   # CLI 連携 (アプリでの生体認証アンロック) をまとめて有効化するため、
   # home.packages ではなく NixOS モジュールで導入する。
