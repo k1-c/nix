@@ -15,5 +15,6 @@
     ./docker.nix
     ./tailscale.nix
     ./sleep-freeze-diag.nix
+    ./focus-mode
   ];
 }

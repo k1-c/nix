@@ -1,0 +1,61 @@
+# Focus モードの恒久許可リスト (全ホスト共通)。
+#
+# 1 行 1 エントリ。# 以降はコメント。書式は Chrome の URLAllowlist と同じ:
+#   example.com        example.com とそのサブドメインすべて
+#   .example.com       example.com だけ (サブドメインは含まない)
+#   example.com/docs   そのパス以下だけ
+#   https://chromeenterprise.google/policies/url-patterns/
+#
+# 編集したら commit → push → rebuild。push しないと次の autoUpgrade で元に戻る。
+# Focus 中に今だけ足すなら `focus allow <URL>` (その Focus が終わると消える)。
+#
+# 許可されるかどうかはページ遷移 (タブ / iframe) 単位で判定される。ページが
+# 裏で読む CDN・フォント・API などは書かなくてよい。
+
+# --- ブラウザ内部ページ・ローカル ---
+chrome://*
+chrome-untrusted://*      # 新しいタブページの部品
+chrome-extension://*      # 1Password などの拡張のページ
+file://*
+localhost
+127.0.0.1
+
+# --- 検索・ログイン ---
+www.google.com
+accounts.google.com
+.accounts.youtube.com     # Google ログインがリダイレクトで経由する。youtube.com 本体は許可しない
+
+# --- 仕事 ---
+integritis.io
+linear.app
+notion.so
+notion.com
+slack.com
+claude.ai
+claude.com
+anthropic.com
+docs.google.com
+drive.google.com
+calendar.google.com
+mail.google.com
+meet.google.com
+1password.com
+
+# --- 開発 ---
+github.com
+githubusercontent.com
+vercel.com
+cloudflare.com
+npmjs.com
+developer.mozilla.org
+stackoverflow.com
+nixos.org
+nix.dev
+nix-community.github.io
+rust-lang.org
+docs.rs
+crates.io
+typescriptlang.org
+nodejs.org
+react.dev
+nextjs.org

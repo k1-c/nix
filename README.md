@@ -46,6 +46,19 @@ Per-DE home-manager configs live in `home/k1nix/desktop/{plasma,hyprland}.nix`. 
 
 > SDDM greeter itself still runs on X11 (`wayland.enable = false`) to dodge the NVIDIA + open-module + `kwin_wayland` atomic-modeset bug — only the Plasma *session* is Wayland.
 
+## Focus mode
+
+Blocks every site in Google Chrome except an allowlist, via a root-owned Chrome policy (`URLBlocklist ["*"]` + `URLAllowlist`), so it cannot be switched off from the browser UI. See `modules/focus-mode/`.
+
+```sh
+focus on [90m]       # start (no password); extends if already on
+focus off            # turns off 10 minutes later (sudo); `focus cancel` to undo
+focus allow <URL>    # allow a host until this focus session ends (sudo)
+focus / focus list   # status / effective allowlist
+```
+
+Permanent entries live in `modules/focus-mode/allowlist.txt`; commit and push before rebuilding, or the daily auto-upgrade reverts it.
+
 ---
 
 ## Initial setup (fresh machine)
