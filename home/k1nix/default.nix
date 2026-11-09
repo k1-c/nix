@@ -12,6 +12,7 @@
     ./vscode.nix
     ./gitui.nix
     ./claude-code.nix
+    ./antigravity-cli.nix
     ./composio.nix
     ./terminal-browser.nix
     ./herdr-reviewr.nix
