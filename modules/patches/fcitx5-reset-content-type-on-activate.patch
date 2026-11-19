@@ -1,0 +1,22 @@
+From c23f127e85b7637c2a3f75d5b20f485a3e2ee742 Mon Sep 17 00:00:00 2001
+From: Weng Xuetian <wengxt@gmail.com>
+Date: Thu, 17 Sep 2026 22:56:00 -0700
+Subject: [PATCH] Reset content type by reset capability to baseFlag
+
+Fix #1676
+---
+ src/frontend/waylandim/waylandimserverv2.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/frontend/waylandim/waylandimserverv2.cpp b/src/frontend/waylandim/waylandimserverv2.cpp
+index ec95670c2..7b2adec14 100644
+--- a/src/frontend/waylandim/waylandimserverv2.cpp
++++ b/src/frontend/waylandim/waylandimserverv2.cpp
+@@ -159,6 +159,7 @@ WaylandIMInputContextV2::WaylandIMInputContextV2(
+         });
+     ic_->activate().connect([this]() {
+         WAYLANDIM_DEBUG() << "ACTIVATE";
++        setCapabilityFlagsWrapper(baseFlags);
+         pendingActivate_ = true;
+     });
+     ic_->deactivate().connect([this]() {
